@@ -1,4 +1,9 @@
 # python rxn_from_file.py input.xml
+#
+# given an input .xml file called input.xml with structure specified by the
+# example file rxns.sml, this script computes the reaction rates for the
+# information given in input assuming all the reactions are elementary and
+# irreversible.
 
 import xml.etree.ElementTree as ET
 import numpy as np
@@ -6,9 +11,9 @@ import reaction_coeffs
 import chemkin
 import sys
 
+# the name of the .xml file will be given in the first command line argument
 filename = sys.argv[1]
 root = ET.parse(filename).getroot()
-# throw error if we can't get this far
 specieslist = root.find('phase').find('speciesArray').text.strip().split(' ')
 conc_list = list(map(lambda x: float(x), 
     root.find('phase').find('concentrations').text.strip().split(' ')))
@@ -16,12 +21,17 @@ k_list = []
 r_stoich = []
 p_stoich = []
 for reaction in root.find('reactionData').findall('reaction'):
+    # the stoichiometric coefficients will be stored in these arrays according
+    # to the ordering given in the variable specieslist
     r_coeffs = [0] * len(specieslist)
     p_coeffs = [0] * len(specieslist)
+    # these 2 lists are the information of specie and stoichiometric coefficient
+    # gleaned from the .xml file
     r_list = reaction.find('reactants').text.strip().split(' ')
     p_list = reaction.find('products').text.strip().split(' ')
     for r in r_list:
         specie_coeff = r.split(':')
+        # this indexing ensures that the same ordering is kept as in specieslist
         r_coeffs[specieslist.index(specie_coeff[0])] = float(specie_coeff[1])
     for p in p_list:
         specie_coeff = p.split(':')
@@ -50,6 +60,8 @@ for reaction in root.find('reactionData').findall('reaction'):
                 k_list.append(reaciton_coeffs.mod_arrh(A, float(b.text), E,\
                     float(T.text)))
 
+# the transpose here is just to have the stoichiometric coefficients for each
+# specie lie along a column, with each column being another reaction
 r_stoich = np.array(r_stoich).transpose()
 p_stoich = np.array(p_stoich).transpose()
 print(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
