@@ -82,7 +82,7 @@ def rxn_rate(x, stoich_r, k, stoich_p = None):
     >>> rxn_rate([1,20,4], [2,1,0], 10)
     -600.0
     '''
-    if not stoich_p:
+    if stoich_p is None:
         stoich_p = np.zeros(np.shape(stoich_r))
     else:
         stoich_p = np.array(stoich_p)
