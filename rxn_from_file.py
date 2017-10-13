@@ -12,6 +12,8 @@ import chemkin
 import sys
 
 # the name of the .xml file will be given in the first command line argument
+if len(sys.argv) < 2:
+    sys.exit(1)
 filename = sys.argv[1]
 root = ET.parse(filename).getroot()
 specieslist = root.find('phase').find('speciesArray').text.strip().split(' ')
