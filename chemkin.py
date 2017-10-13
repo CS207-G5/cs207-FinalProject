@@ -99,3 +99,62 @@ def rxn_rate(x, stoich_r, k, stoich_p = None):
         return np.sum(omega * (stoich_p - stoich_r))
     else:
         return np.sum(omega * (stoich_p - stoich_r), axis=1)
+
+
+def reversible_rxn_rate(x, stoich_r, k, stoich_p = None):
+    '''
+    Returns the reaction rate, f, for each specie (listed in x)
+    through one or multiple (number of columns in stoich_r)
+    reversible reactions.
+
+    f = sum(omega_j*nu_ij) for i species in j reactions.
+
+    INPUTS
+    ======
+    x:        numeric list or array
+              concentrations of reactants
+    stoich_r: numeric list of lists or array
+              column length must equal length of x
+              number of columns indicates number of reactions
+              stoichiometric coefficients of reactants
+    stoich_p: numeric list of lists or array
+              must be equal in shape to stoich_r
+              stoichiometric coefficients of products
+    k:        a numeric value (or values, for multiple reactions)
+              reaction rate coefficient
+
+    RETURNS
+    =======
+    f:        the reaction rate for each specie, numeric
+    '''
+    raise NotImplementedError
+
+
+
+def nonel_rxn_rate(x, stoich_r, k, stoich_p = None):
+    '''
+    Returns the reaction rate, f, for each specie (listed in x)
+    through one or multiple (number of columns in stoich_r)
+    nonelementary reactions.
+
+    f = sum(omega_j*nu_ij) for i species in j reactions.
+
+    INPUTS
+    ======
+    x:        numeric list or array
+              concentrations of reactants
+    stoich_r: numeric list of lists or array
+              column length must equal length of x
+              number of columns indicates number of reactions
+              stoichiometric coefficients of reactants
+    stoich_p: numeric list of lists or array
+              must be equal in shape to stoich_r
+              stoichiometric coefficients of products
+    k:        a numeric value (or values, for multiple reactions)
+              reaction rate coefficient
+
+    RETURNS
+    =======
+    f:        the reaction rate for each specie, numeric
+    '''
+    raise NotImplementedError
