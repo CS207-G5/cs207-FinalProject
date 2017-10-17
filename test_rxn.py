@@ -7,7 +7,9 @@ import chemkin
 import sys
 
 def test_normal():
-    assert all(rx.compute("rxns.xml")==[2.05828207e-09,-2.05828207e-09,2.05828207e-09,-2.05828207e-09,-4.67050150e-28])
+   
+  
+    assert list(rx.compute("rxns.xml"))==[2.058282074119749e-09, -2.058282074119749e-09, 2.058282074119749e-09, -2.058282074119749e-09, -4.6705014964287609e-28]
 def test_A():
     try:
         rx.compute("rxns_a.xml")    
@@ -20,7 +22,8 @@ def test_E():
         assert(True)
 
 def test_B():
-    assert all(rx.compute("rxns_b.xml")==[8.19416853e-15,-8.19416853e-15,8.19416853e-15,-8.19416853e-15,-1.17317693e-26])
-    
+    print(list(rx.compute("rxns_b.xml")))
+    assert list(rx.compute("rxns_b.xml"))==[8.194168527276232e-15, -8.194168527276232e-15, 8.1941685272996958e-15, -8.1941685272879639e-15, -1.1731769337224591e-26]
 def test_T():
-    assert all(rx.compute("rxns_t.xml")==[5.38119498e+01,-5.38119498e+01,5.38145831e+01,-5.38132664e+01,-1.31667343e-03])
+    print(list(rx.compute("rxns_t.xml")))
+    assert list(rx.compute("rxns_t.xml"))==[53.811949752854751, -53.811949752854751, 53.814583099716863, -53.813266426285807, -0.0013166734310555181]
