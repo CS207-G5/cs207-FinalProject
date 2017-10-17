@@ -71,6 +71,6 @@ def compute(filename):
     print(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
 
 # the name of the .xml file will be given in the first command line argument
-if len(sys.argv) >= 2:
-    compute(sys.argv[1])
+#if len(sys.argv) >= 2:
+#    compute(sys.argv[1])
 
