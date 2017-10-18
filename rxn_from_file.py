@@ -68,10 +68,10 @@ def compute(filename):
     # specie lie along a column, with each column being another reaction
     r_stoich = np.array(r_stoich).transpose()
     p_stoich = np.array(p_stoich).transpose()
-    #print(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
+    print(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
     
     return np.array(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
 # the name of the .xml file will be given in the first command line argument
-#if len(sys.argv) >= 2:
-#    compute(sys.argv[1])
+if len(sys.argv) >= 2:
+    compute(sys.argv[1])
 
