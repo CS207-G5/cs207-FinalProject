@@ -1,5 +1,5 @@
 import numpy as np
-
+import reacton_coeffs
 
 def prog_rate(x, stoich, k):
     '''
