@@ -12,9 +12,8 @@ client_sr = [ [2,0,0], [1,0,1], [0,1,0], [0,1,0], [0,0,1] ]
 client_sp = [ [1,0,0], [0,1,0], [2,0,1], [0,0,1], [0,1,0] ]
     
 def test_rxnrate():
-    assert (all(chemkin.rxn_rate(x = client_x, k = 10, 
-                             stoich_p = client_sp, 
-                             stoich_r = client_sr) == [-40., -45.,  85.,   5.,  -5.]))
+    er = chemkin.ElementaryRxn(client_x, client_sr, 10)
+    assert (all(er.rxn_rate(stoich_p = client_sp) == [-40., -45.,  85.,   5., -5.]))
     
 def test_no_stoichproducts():
     assert (all(chemkin.rxn_rate(x = client_x, k = 10,

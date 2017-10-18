@@ -1,1 +1,10 @@
-{}
+{
+  "chemkin.py::chemkin.ElementaryRxn.prog_rate": true,
+  "chemkin.py::chemkin.ElementaryRxn.rxn_rate": true,
+  "test_chemkin.py::test_no_stoichproducts": true,
+  "test_chemkin.py::test_onerxn": true,
+  "test_chemkin.py::test_rxnrate": true,
+  "test_rxn.py::test_B": true,
+  "test_rxn.py::test_T": true,
+  "test_rxn.py::test_normal": true
+}
