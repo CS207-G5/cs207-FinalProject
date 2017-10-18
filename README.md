@@ -11,4 +11,7 @@ G5's Final Project for CS207
   * Have the class return an object that has member methods which can be called
     on just the concentrations alone.
   * Write new tests for all of the above.
+  * Update model doc to reflect all of the above (for example, things are going
+    to change in the way we run this code, so the *Basic Usage and Examples*
+    section will have to change).
 
