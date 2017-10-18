@@ -1,6 +1,7 @@
 import reaction_coeffs
 import numbers
 import numpy as np
+import doctest
 
 
 class ElementaryRxn():
@@ -30,10 +31,10 @@ class ElementaryRxn():
 
         EXAMPLES
         =======
-        >>> prog_rate([1,2,4], [2,1,0], 10)
+        >>> ElementaryRxn([1, 2, 4], [2, 1, 0], 10).prog_rate()
         20
 
-        >>> prog_rate(stoich = [[1,2],[2,0],[0,2]], x = [1,2,1], k = 10)
+        >>> ElementaryRxn(stoich = [[1,2],[2,0],[0,2]], x = [1,2,1], k = 10).prog_rate()
         [40, 10]
         '''
         x = self.x
@@ -87,17 +88,15 @@ class ElementaryRxn():
 
         EXAMPLES
         =======
-        >>> rxn_rate(x = [1,2,1], stoich_r = [[1,0],[2,0],[0,2]], stoich_p = [[0,1],[0,2],[1,0]], k=10)
+        >>> ElementaryRxn(x = [1,2,1], stoich = [[1,0],[2,0],[0,2]], k=10).rxn_rate(stoich_p = [[0,1],[0,2],[1,0]])
         array([-30, -60,  20])
 
-        >>> rxn_rate([1,20,4], [2,1,0], 10)
+        >>> ElementaryRxn([1,20,4], [2,1,0], 10).rxn_rate()
         -600.0
         '''
         stoich_r = self.stoich
         x = self.x
         k = self.k
-        print(stoich_r, x, k)
-        print('hello')
 
         if stoich_p is None:
             stoich_p = np.zeros(np.shape(stoich_r))
@@ -183,3 +182,4 @@ class NonelRxn(ElementaryRxn):
         f:        the reaction rate for each specie, numeric
         '''
         raise NotImplementedError
+

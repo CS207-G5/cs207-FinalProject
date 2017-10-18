@@ -1,5 +1,3 @@
-# python rxn_from_file.py input.xml
-#
 # given an input .xml file called input.xml with structure specified by the
 # example file rxns.sml, this script computes the reaction rates for the
 # information given in input assuming all the reactions are elementary and
@@ -9,7 +7,6 @@ import xml.etree.ElementTree as ET
 import numpy as np
 import reaction_coeffs
 import chemkin
-import sys
 
 def compute(filename):
     root = ET.parse(filename).getroot()
@@ -68,10 +65,7 @@ def compute(filename):
     # specie lie along a column, with each column being another reaction
     r_stoich = np.array(r_stoich).transpose()
     p_stoich = np.array(p_stoich).transpose()
+    rxn = chemkin.ElementaryRxn(conc_list, r_stoich, k_list)
     #print(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
-    
-    return np.array(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
-# the name of the .xml file will be given in the first command line argument
-#if len(sys.argv) >= 2:
-#    compute(sys.argv[1])
+    return np.array(rxn.rxn_rate(p_stoich))
 
