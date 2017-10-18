@@ -6,4 +6,9 @@ G5's Final Project for CS207
 [![Coverage Status](https://coveralls.io/repos/github/CS207-G5/cs207-FinalProject/badge.svg?branch=master&maxAge=0)](https://coveralls.io/github/CS207-G5/cs207-FinalProject?branch=master&maxAge=0)
 
 ### TODO
-* Bump up test coverage if possible (technically ok with at least 70%)
+* On the `classes` branch, integrate data retrieval of .xml files into the new
+  class in `chemkin.py`.
+  * Have the class return an object that has member methods which can be called
+    on just the concentrations alone.
+  * Write new tests for all of the above.
+
