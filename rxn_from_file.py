@@ -43,10 +43,15 @@ def compute(filename):
             k_list.append(reaction_coeffs.const(float(ratecoeff.find('k').text)))
         else:
             # Arrhenius
+            if ratecoeff.find('Arrhenius').find('A') is None:
+                raise ValueError("A is not found")
+            if ratecoeff.find('Arrhenius').find('E') is None:
+                raise ValueError("E is not found")
             A = float(ratecoeff.find('Arrhenius').find('A').text)
             E = float(ratecoeff.find('Arrhenius').find('E').text)
             T = ratecoeff.find('Arrhenius').find('T')
             b = ratecoeff.find('Arrhenius').find('b')
+
             if b is None:
                 if T is None:
                     k_list.append(reaction_coeffs.arrh(A, E))
@@ -56,7 +61,7 @@ def compute(filename):
                 if T is None:
                     k_list.append(reaction_coeffs.mod_arrh(A, float(b.text), E))
                 else:
-                    k_list.append(reaciton_coeffs.mod_arrh(A, float(b.text), E,\
+                    k_list.append(reaction_coeffs.mod_arrh(A, float(b.text), E,\
                         float(T.text)))
 
     # the transpose here is just to have the stoichiometric coefficients for each
@@ -64,7 +69,8 @@ def compute(filename):
     r_stoich = np.array(r_stoich).transpose()
     p_stoich = np.array(p_stoich).transpose()
     print(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
-
+    
+    return np.array(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
 # the name of the .xml file will be given in the first command line argument
 if len(sys.argv) >= 2:
     compute(sys.argv[1])

@@ -1,7 +1,5 @@
-import reaction_coeffs
-import numbers
 import numpy as np
-
+import reaction_coeffs
 
 def prog_rate(x, stoich, k):
     '''
@@ -11,15 +9,15 @@ def prog_rate(x, stoich, k):
     INPUTS
     ======
     x:       numeric list
-             concentrations of A, B, C
+             concentrations of A, B, C...
     stoich:  numeric list of lists or array, equal column length to x
-             stoichiometric coefficients of reactants A, B, C
+             stoichiometric coefficients of reactants A, B, C...
     k:       a numeric value
              reaction rate coefficient
 
     RETURNS
     =======
-    omega:   the progress rate for the reaction, numeric
+    omega:   numpy array of progress rate(s) for the reaction, numeric
 
     EXAMPLES
     =======
@@ -72,7 +70,7 @@ def rxn_rate(x, stoich_r, k, stoich_p = None):
 
     RETURNS
     =======
-    f:        the reaction rate for each specie, numeric
+    f:        numpy array of reaction rate for each specie, numeric
 
     EXAMPLES
     =======

@@ -18,6 +18,8 @@ def const(k):
     5
     '''
     assert(isinstance(k, numbers.Number)), "Please specify a numeric reaction rate coefficient!"
+    if k < 0:
+        raise ValueError("Reaction rate must be positive.")
     return k
 
 def arrh(A, E, T = 100):
