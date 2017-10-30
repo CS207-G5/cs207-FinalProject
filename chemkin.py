@@ -6,12 +6,13 @@ import doctest
 
 class ElementaryRxn():
 
-    def __init__(self, x, stoich, k):
-        self.x = x
-        self.stoich = stoich
+    def __init__(self, stoichr, k, stoichp=None):
+ 
+        self.stoichr = stoichr
+        self.stoichp=stoichp 
         self.k = k
-
-    def prog_rate(self):
+        self.x=0
+    def prog_rate(self,x):
         '''
         Returns the progress rate for N species going through M
         irreversible, elementary reactions.
@@ -20,7 +21,7 @@ class ElementaryRxn():
         ======
         x:       numeric list
                  concentrations of A, B, C
-        stoich:  numeric list of lists or array, equal column length to x
+        stoichr:  numeric list of lists or array, equal column length to x
                  stoichiometric coefficients of reactants A, B, C
         k:       a numeric value
                  reaction rate coefficient
@@ -31,16 +32,16 @@ class ElementaryRxn():
 
         EXAMPLES
         =======
-        >>> ElementaryRxn([1, 2, 4], [2, 1, 0], 10).prog_rate()
+        >>> ElementaryRxn([1, 2, 4], 10).prog_rate([2, 1, 0])
         20
 
-        >>> ElementaryRxn(stoich = [[1,2],[2,0],[0,2]], x = [1,2,1], k = 10).prog_rate()
+        >>> ElementaryRxn(stoichr = [[1,2],[2,0],[0,2]], k = 10).prog_rate([1,2,1])
         [40, 10]
         '''
-        x = self.x
-        stoich = self.stoich
-        k = self.k
 
+        stoich = self.stoichr
+        k = self.k
+        self.x=x
         x = np.array(x)
         stoich = np.array(stoich)
 
@@ -60,7 +61,7 @@ class ElementaryRxn():
             omega = k * np.product(x**stoich.T, axis=1)
             return omega.tolist()
 
-    def rxn_rate(self, stoich_p = None):
+    def rxn_rate(self,  x):
         '''
         Returns the reaction rate, f, for each specie (listed in x)
         through one or multiple (number of columns in stoich_r)
@@ -88,16 +89,17 @@ class ElementaryRxn():
 
         EXAMPLES
         =======
-        >>> ElementaryRxn(x = [1,2,1], stoich = [[1,0],[2,0],[0,2]], k=10).rxn_rate(stoich_p = [[0,1],[0,2],[1,0]])
+        >>> ElementaryRxn( stoichr = [[1,0],[2,0],[0,2]], k=10,stoichp = [[0,1],[0,2],[1,0]]).rxn_rate(x = [1,2,1])
         array([-30, -60,  20])
 
-        >>> ElementaryRxn([1,20,4], [2,1,0], 10).rxn_rate()
+        >>> ElementaryRxn([2,1,0], 10).rxn_rate([1,20,4])
         -600.0
         '''
-        stoich_r = self.stoich
-        x = self.x
+        stoich_r = self.stoichr
+        stoich_p = self.stoichp
+  
         k = self.k
-
+        self.x=x
         if stoich_p is None:
             stoich_p = np.zeros(np.shape(stoich_r))
         else:
@@ -107,7 +109,7 @@ class ElementaryRxn():
 #        assert(stoich_r.shape == stoich_p.shape), "Reactant and product stoich. coefficients must be same dimensions"
 
         # Get a list of progress rates for each reaction
-        omega = self.prog_rate()
+        omega = self.prog_rate(x)
 
         # Multiply by difference in stoichiometric coefficients,
         # then sum across reactions.
@@ -124,7 +126,7 @@ class ElementaryRxn():
 
 class ReversibleRxn(ElementaryRxn):
 
-    def reversible_rxn_rate(x, stoich_r, k, stoich_p = None):
+    def reversible_rxn_rate(stoich_r, stoich_p, k ):
         '''
         Returns the reaction rate, f, for each specie (listed in x)
         through one or multiple (number of columns in stoich_r)
@@ -155,7 +157,7 @@ class ReversibleRxn(ElementaryRxn):
 
 
 class NonelRxn(ElementaryRxn):
-    def nonel_rxn_rate(x, stoich_r, k, stoich_p = None):
+    def nonel_rxn_rate(stoich_r, stoich_p,k):
         '''
         Returns the reaction rate, f, for each specie (listed in x)
         through one or multiple (number of columns in stoich_r)

@@ -65,7 +65,7 @@ def compute(filename):
     # specie lie along a column, with each column being another reaction
     r_stoich = np.array(r_stoich).transpose()
     p_stoich = np.array(p_stoich).transpose()
-    rxn = chemkin.ElementaryRxn(conc_list, r_stoich, k_list)
+    rxn = chemkin.ElementaryRxn(r_stoich, k_list, p_stoich)
     #print(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
-    return np.array(rxn.rxn_rate(p_stoich))
+    return np.array(rxn.rxn_rate(conc_list))
 
