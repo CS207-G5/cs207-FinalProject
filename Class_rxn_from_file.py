@@ -77,8 +77,21 @@ class rxnset:
         self.conc_list=conc_list
         self.nuij=self.p_stoich-self.r_stoich
 
+    def update_NASA(self, filename="NASA.xml", input_T=1500):
+        self.NASA={}
+        root = ET.parse(filename).getroot()
+        for s in root.findall('species'):
+            for specie in self.specieslist:
+                if s.attrib['name']==specie:
+                    for NS in s.findall('NASA'):
+                        if float(NS.attrib['Tmin'])<=input_T<=float(NS.attrib['Tmax']):
+                            self.NASA[specie]=NS.find('floatArray').text
+
+
+
 if __name__ == "__main__":
     x=rxnset()
     x.compute("rxns.xml",input_T=100)
     print("species: {}\nconcentration:{}\nr:{}\np:{}\nnuij:{}\nk:{}\n ".format(x.specieslist,x.conc_list,x.r_stoich,x.p_stoich,x.nuij, x.k_list))
-
+    x.update_NASA(input_T=800)
+    print("NASA: {}".format(x.NASA))
