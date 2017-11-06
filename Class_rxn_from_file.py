@@ -1,7 +1,4 @@
-# given an input .xml file called input.xml with structure specified by the
-# example file rxns.sml, this script computes the reaction rates for the
-# information given in input assuming all the reactions are elementary and
-# irreversible.
+# given an input .xml file, collect the information and write it into a rxnset object
 
 import xml.etree.ElementTree as ET
 import numpy as np
