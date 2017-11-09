@@ -12,16 +12,10 @@ client_sr = [ [2,0,0], [1,0,1], [0,1,0], [0,1,0], [0,0,1] ]
 client_sp = [ [1,0,0], [0,1,0], [2,0,1], [0,0,1], [0,1,0] ]
     
 def test_rxnrate():
-    er = chemkin.ElementaryRxn(client_sr, 10, client_sp)
-    assert (all(er.rxn_rate(client_x ) == [-40., -45.,  85.,   5., -5.]))
-    
-def test_no_stoichproducts():
-    er = chemkin.ElementaryRxn(k = 10, stoichr = client_sr)
-    assert (all(er.rxn_rate(client_x) == [-80., -50.,  -5.,  -5., -10]))
+    assert (all(chemkin.ElementaryRxn('rxnrate.xml').rxn_rate(client_x) == [-40., -45.,  85.,   5., -5.]))
     
 def test_onerxn():
-    er = chemkin.ElementaryRxn(stoichr = [2, 1, 0], k = 10,)
-    assert (er.rxn_rate([1, 2, 4]) == -60)
+    assert (chemkin.ElementaryRxn('onerxn.xml').rxn_rate([1, 2, 4]) == 60.0)
     
 def test_zerotemp_mod():
     assert(chemkin.reaction_coeffs.mod_arrh(A=10**8, b=0.5, E=5*10**4, T=0) == 0.0)

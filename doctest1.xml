@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<ctml>
+
+    <phase>
+        <speciesArray> H O2 O </speciesArray>
+    </phase>
+
+    <reactionData id="test_mechanism">
+
+        <!-- reaction 01  -->
+        <reaction reversible="no" type="Elementary" id="reaction01">
+            <rateCoeff>
+                <k units="m3/mol/s">10</k>
+            </rateCoeff>
+            <reactants>H:2 O2:1 O:0</reactants>
+            <products>H:1 O2:1 O:3</products>
+        </reaction>
+
+    </reactionData>
+
+</ctml>
