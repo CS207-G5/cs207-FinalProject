@@ -103,10 +103,10 @@ class ElementaryRxn():
 
         EXAMPLES
         =======
-        >>> ElementaryRxn('doctest1.xml').prog_rate([1, 2, 4])
+        >>> ElementaryRxn('test/doctest1.xml').prog_rate([1, 2, 4])
         [20.0]
 
-        >>> ElementaryRxn('doctest2.xml').prog_rate([1,2,1])
+        >>> ElementaryRxn('test/doctest2.xml').prog_rate([1,2,1])
         [40.0, 10.0]
         '''
         k = self.k
@@ -144,7 +144,7 @@ class ElementaryRxn():
 
         EXAMPLES
         =======
-        >>> ElementaryRxn('doctest3.xml').rxn_rate([1,2,1])
+        >>> ElementaryRxn('test/doctest3.xml').rxn_rate([1,2,1])
         array([-30., -60.,  20.])
 
         '''
