@@ -101,8 +101,12 @@ def test_backwards_coeffs():
     rever.backward_coeffs(900)
     assert((rever.kb == [10, 10, 10]).all())
 
+rev = chemkin.ReversibleRxn('test/rxns_rev.xml')
+x=[10,10,10,10]
+
 def test_prog_rate_reversible():
-    pass
+    np.testing.assert_allclose(rev.prog_rate(x,1200),[-1.22703266e+09])
 
 def test_rxnrate_reversible():
-    pass
+    np.testing.assert_allclose(rev.rxn_rate(x,1200),[ 1.22703266e+09,   1.22703266e+09,  -1.22703266e+09,
+        -1.22703266e+09])
