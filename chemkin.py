@@ -31,10 +31,11 @@ class ElementaryRxn():
         # later if we might want to specify initial concentrations in the .xml
         #conc_list = list(map(lambda x: float(x),
         #    root.find('phase').find('concentrations').text.strip().split(' ')))
-        k_list = []
+        # k_list = []
         r_stoich = []
         p_stoich = []
         self.reversible = []
+        self.rxnparams = []
         for reaction in root.find('reactionData').findall('reaction'):
             if reaction.attrib['reversible'] == 'yes':
                 self.reversible.append(True)
@@ -60,7 +61,7 @@ class ElementaryRxn():
             ratecoeff = reaction.find('rateCoeff')
             if ratecoeff.find('Arrhenius') is None:
                 # constant rate coeff
-                k_list.append(reaction_coeffs.const(float(ratecoeff.find('k').text)))
+                self.rxnparams.append([reaction_coeffs.const(float(ratecoeff.find('k').text))])
             else:
                 # Arrhenius
                 if ratecoeff.find('Arrhenius').find('A') is None:
@@ -69,32 +70,20 @@ class ElementaryRxn():
                     raise ValueError("E is not found")
                 A = float(ratecoeff.find('Arrhenius').find('A').text)
                 E = float(ratecoeff.find('Arrhenius').find('E').text)
-                T = ratecoeff.find('Arrhenius').find('T')
                 b = ratecoeff.find('Arrhenius').find('b')
-
-                if b is None:
-                    if T is None:
-                        k_list.append(reaction_coeffs.arrh(A, E))
-                    else:
-                        k_list.append(reaction_coeffs.arrh(A, E, float(T.text)))
-                else:
-                    if T is None:
-                        k_list.append(reaction_coeffs.mod_arrh(A, float(b.text), E))
-                    else:
-                        k_list.append(reaction_coeffs.mod_arrh(A, float(b.text), E,\
-                            float(T.text)))
+                self.rxnparams.append([A, E, b])
 
         # the transpose here is just to have the stoichiometric coefficients for each
         # specie lie along a column, with each column being another reaction
         self.r_stoich = np.array(r_stoich).transpose()
         self.p_stoich = np.array(p_stoich).transpose()
-        self.k = k_list
+        # self.k = k_list
         self.specieslist = specieslist
         # rxn = chemkin.ElementaryRxn(conc_list, r_stoich, k_list)
         # print(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
         # return np.array(rxn.rxn_rate(p_stoich))
 
-    def prog_rate(self, x):
+    def prog_rate(self, x, T):
         '''
         Returns the progress rate for N species going through M
         irreversible, elementary reactions.
@@ -110,13 +99,21 @@ class ElementaryRxn():
 
         EXAMPLES
         =======
-        >>> ElementaryRxn('test/doctest1.xml').prog_rate([1, 2, 4])
+        >>> ElementaryRxn('test/doctest1.xml').prog_rate([1, 2, 4], 1200)
         [20.0]
 
-        >>> ElementaryRxn('test/doctest2.xml').prog_rate([1,2,1])
+        >>> ElementaryRxn('test/doctest2.xml').prog_rate([1,2,1], 1200)
         [40.0, 10.0]
         '''
-        k = self.k
+        k = []
+        for elt in self.rxnparams:
+            if len(elt) == 1:
+                k.append(elt[0])
+            elif elt[2] is None:
+                k.append(reaction_coeffs.arrh(elt[0], elt[1], T))
+            else:
+                k.append(reaction_coeffs.mod_arrh(elt[0],
+                    float(elt[2].text), elt[1], T))
         x = np.array(x)
         stoich = np.array(self.r_stoich)
         k = np.array(k)
@@ -132,7 +129,7 @@ class ElementaryRxn():
 #       else:
         return list(k * np.product(x**stoich.T, axis=1))
 
-    def rxn_rate(self, x):
+    def rxn_rate(self, x, T):
         '''
         Returns the reaction rate, f, for each specie (listed in x)
         through one or multiple (number of columns in stoich_r)
@@ -151,7 +148,7 @@ class ElementaryRxn():
 
         EXAMPLES
         =======
-        >>> ElementaryRxn('test/doctest3.xml').rxn_rate([1,2,1])
+        >>> ElementaryRxn('test/doctest3.xml').rxn_rate([1,2,1], 1200)
         array([-30., -60.,  20.])
 
         '''
@@ -160,7 +157,7 @@ class ElementaryRxn():
 #        assert(stoich_r.shape == stoich_p.shape), "Reactant and product stoich. coefficients must be same dimensions"
 
         # Get a list of progress rates for each reaction
-        omega = self.prog_rate(x)
+        omega = self.prog_rate(x, T)
 
         # Multiply by difference in stoichiometric coefficients,
         # then sum across reactions.
@@ -187,7 +184,6 @@ class ReversibleRxn(ElementaryRxn):
         self.r = self.r_stoich
         self.p = self.p_stoich
         self.nuij = self.p - self.r
-        self.kf = np.array(self.k)
         self.p0 = 1.0e+05
         self.R = 8.3144598
         self.gamma = np.sum(self.nuij, axis=0)
@@ -260,8 +256,18 @@ class ReversibleRxn(ElementaryRxn):
         # Ke
         ke = fact**self.gamma * np.exp(delta_G_over_RT)
         print("ke: ", ke)
-        self.kb = self.kf
-        for i in range(0, len(self.kb)):
+        kf = []
+        for elt in self.rxnparams:
+            if len(elt) == 1:
+                kf.append(elt)
+            elif elt[2] is None:
+                kf.append(reaction_coeffs.arrh(elt[0], elt[1], T))
+            else:
+                kf.append(reaction_coeffs.mod_arrh(elt[0],
+                    float(elt[2].text), elt[1], T))
+        self.kf = np.array(kf)
+        self.kb = np.copy(self.kf)
+        for i in range(len(self.kb)):
             if self.reversible[i]:
                 self.kb[i] = self.kf[i] / ke[i]
         print("kb: ", self.kb)
