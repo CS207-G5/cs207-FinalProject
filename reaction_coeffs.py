@@ -22,7 +22,7 @@ def const(k):
         raise ValueError("Reaction rate must be positive.")
     return k
 
-def arrh(A, E, T = 100):
+def arrh(A, E, T = 1200):
     '''
     Returns the Arrhenius reaction rate coefficient, k_arr.
 
@@ -87,7 +87,7 @@ def arrh(A, E, T = 100):
     # Return the solution to the equation
     return A*math.exp(-E/(R*T))
 
-def mod_arrh(A, b, E, T = 100):
+def mod_arrh(A, b, E, T = 1200):
     '''
     Returns modified Arrhenius reaction rate coefficient, k_mod-arr.
 
