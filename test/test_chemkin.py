@@ -1,16 +1,18 @@
 import sys
-sys.path.append('..')
+sys.path.append('..')  # Needs to be before chemkin import
 import chemkin
-import numpy as np
 import cmath
 
 client_x = [2, 1, 0.5, 1, 1]
 client_temps = [750, 1500, 2500]
+# We don't seem to use these k values. Should we or are they no longer useful?
 k1 = [chemkin.reaction_coeffs.mod_arrh(A=10**8, b=0.5, E=5*10**4, T=i) for i in client_temps]
 k2 = [chemkin.reaction_coeffs.const(10**4)]*3
 k3 = [chemkin.reaction_coeffs.arrh(A=10**7, E=10**4, T=i) for i in client_temps]
 client_sr = [ [2,0,0], [1,0,1], [0,1,0], [0,1,0], [0,0,1] ]
 client_sp = [ [1,0,0], [0,1,0], [2,0,1], [0,0,1], [0,1,0] ]
+
+# Tests for basic ElementaryRxn()
 
 def test_rxnrate():
     assert (all(chemkin.ElementaryRxn('test/rxnrate.xml').rxn_rate(client_x) == [-40., -45.,  85.,   5., -5.]))
@@ -29,3 +31,65 @@ def test_complex():
         chemkin.reaction_coeffs.mod_arrh(A=10**8, b=cmath.sqrt(-5), E=5*10**4, T=0) == 0.0
     except ValueError as err:
         assert(type(err) == ValueError)
+
+# Tests for ReversibleRxn()
+
+def test_creation():
+    rever = chemkin.ReversibleRxn('test/rxnrate.xml')
+    assert(rever.s == ['H', 'O', 'OH', 'H2', 'O2'])
+    assert((rever.r == [[2,  0,  0],
+                        [1,  0,  1],
+                        [0,  1,  0],
+                        [0,  1,  0],
+                        [0,  0,  1]]).all())
+
+    assert((rever.p == [[1,  0,  0],
+                        [0,  1,  0],
+                        [2,  0,  1],
+                        [0,  0,  1],
+                        [0,  1,  0]]).all())
+    assert((rever.nuij == [[-1,  0,  0],
+                           [-1,  1, -1],
+                           [2, -1,  1],
+                           [0, -1,  1],
+                           [0,  1, -1]]).all())
+    assert((rever.kf == [10, 10, 10]).all())
+    assert(rever.p0 == 1.0e+05)
+    assert(rever.R == 8.3144598)
+    assert((rever.gamma == [0, 0, 0]).all())
+
+def read_db():
+    pass
+
+def test_trange_greater():
+    pass
+
+def test_trange_lesser():
+    pass
+
+def test_getlowcoeffs():
+    pass
+
+def test_gethighcoeffs():
+    pass
+
+def test_badT():
+    pass
+
+def test_Cp():
+    pass
+
+def test_H():
+    pass
+
+def test_S():
+    pass
+
+def test_backwards_coeffs():
+    pass
+
+def test_prog_rate_reversible():
+    pass
+
+def test_rxnrate_reversible():
+    pass
