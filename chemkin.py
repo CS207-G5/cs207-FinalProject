@@ -29,7 +29,7 @@ class ElementaryRxn():
         # commenting out the below because we won't be receiving the
         # concentrations from the input .xml file, however this could be useful
         # later if we might want to specify initial concentrations in the .xml
-        #conc_list = list(map(lambda x: float(x), 
+        #conc_list = list(map(lambda x: float(x),
         #    root.find('phase').find('concentrations').text.strip().split(' ')))
         k_list = []
         r_stoich = []
@@ -188,8 +188,8 @@ class ReversibleRxn(ElementaryRxn):
         self.p = rxn.p_stoich
         self.nuij = self.p - self.r
         self.kf = np.array(rxn.k)
-        self.p0 = 1.0e+05 
-        self.R = 8.3144598 
+        self.p0 = 1.0e+05
+        self.R = 8.3144598
         self.gamma = np.sum(self.nuij, axis=0)
 
     def read_SQL(self, T):
@@ -198,7 +198,7 @@ class ReversibleRxn(ElementaryRxn):
             t_range=[]
             for species in self.s:
                 v=cursor.execute('''SELECT THIGH
-                from LOW WHERE species_name= ?''',(species,)).fetchall()  
+                from LOW WHERE species_name= ?''', (species,)).fetchall()
                 if v[0] > T:
                     t_range.append('high')
                 else:
@@ -207,15 +207,15 @@ class ReversibleRxn(ElementaryRxn):
 
         def get_coeffs(species_name, temp_range):
             if temp_range == 'low':
-                v=cursor.execute('''SELECT COEFF_1,COEFF_2,COEFF_3,COEFF_4,COEFF_5,COEFF_6,COEFF_7 
+                v=cursor.execute('''SELECT COEFF_1,COEFF_2,COEFF_3,COEFF_4,COEFF_5,COEFF_6,COEFF_7
                 from LOW WHERE species_name= ?''',(species_name,)).fetchall()
             elif temp_range == 'high':
-                v=cursor.execute('''SELECT COEFF_1,COEFF_2,COEFF_3,COEFF_4,COEFF_5,COEFF_6,COEFF_7 
+                v=cursor.execute('''SELECT COEFF_1,COEFF_2,COEFF_3,COEFF_4,COEFF_5,COEFF_6,COEFF_7
                 from HIGH WHERE species_name= ?''',(species_name,)).fetchall()
             coeffs=v[0]
-            return coeffs 
+            return coeffs
 
-        db = sqlite3.connect('NASA.sqlite') 
+        db = sqlite3.connect('NASA.sqlite')
         cursor = db.cursor()
         coefs=[]
         t_range=choose_t_range(T)
@@ -227,20 +227,20 @@ class ReversibleRxn(ElementaryRxn):
 
     def Cp_over_R(self, T):
         a = self.nasa
-        Cp_R = (a[:,0] + a[:,1] * T + a[:,2] * T**2.0 
+        Cp_R = (a[:,0] + a[:,1] * T + a[:,2] * T**2.0
                 + a[:,3] * T**3.0 + a[:,4] * T**4.0)
         return Cp_R
 
     def H_over_RT(self, T):
         a = self.nasa
-        H_RT = (a[:,0] + a[:,1] * T / 2.0 + a[:,2] * T**2.0 / 3.0 
-                + a[:,3] * T**3.0 / 4.0 + a[:,4] * T**4.0 / 5.0 
+        H_RT = (a[:,0] + a[:,1] * T / 2.0 + a[:,2] * T**2.0 / 3.0
+                + a[:,3] * T**3.0 / 4.0 + a[:,4] * T**4.0 / 5.0
                 + a[:,5] / T)
         return H_RT
-               
+
     def S_over_R(self, T):
         a = self.nasa
-        S_R = (a[:,0] * np.log(T) + a[:,1] * T + a[:,2] * T**2.0 / 2.0 
+        S_R = (a[:,0] * np.log(T) + a[:,1] * T + a[:,2] * T**2.0 / 2.0
                + a[:,3] * T**3.0 / 3.0 + a[:,4] * T**4.0 / 4.0 + a[:,6])
         return S_R
 
@@ -250,7 +250,7 @@ class ReversibleRxn(ElementaryRxn):
         delta_H_over_RT = np.dot(self.nuij.T, self.H_over_RT(T))
         delta_S_over_R = np.dot(self.nuij.T, self.S_over_R(T))
 
-        # Negative of change in Gibbs free energy for each reaction 
+        # Negative of change in Gibbs free energy for each reaction
         delta_G_over_RT = delta_S_over_R - delta_H_over_RT
 
         # Prefactor in Ke
