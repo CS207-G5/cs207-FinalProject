@@ -219,13 +219,13 @@ class ReversibleRxn(ElementaryRxn):
 
         db = sqlite3.connect('NASA.sqlite')
         cursor = db.cursor()
-        coefs=[]
-        t_range=choose_t_range(T)
-        s_t=zip(self.s, t_range)
+        coefs = []
+        t_range = choose_t_range(T)
+        s_t = zip(self.s, t_range)
         for species, tmp in s_t:
-            coef=get_coeffs(species,tmp)
+            coef = get_coeffs(species, tmp)
             coefs.append(coef)
-        self.nasa=np.array(coefs)
+        self.nasa = np.array(coefs)
 
     def Cp_over_R(self, T):
         a = self.nasa

@@ -58,8 +58,13 @@ def test_creation():
     assert(rever.R == 8.3144598)
     assert((rever.gamma == [0, 0, 0]).all())
 
-def read_db():
-    pass
+def test_read_db():
+    rever = chemkin.ReversibleRxn('test/rxnrate.xml')
+    rever.read_SQL(100)
+    assert((rever.nasa[0] == [[2.50000001e+00, -2.30842973e-11,
+                               1.61561948e-14, -4.73515235e-18,
+                               4.98197357e-22,  2.54736599e+04,
+                               -4.46682914e-01]]).all())
 
 def test_trange_greater():
     pass
@@ -74,7 +79,11 @@ def test_gethighcoeffs():
     pass
 
 def test_badT():
-    pass
+    rever = chemkin.ReversibleRxn('test/rxnrate.xml')
+    try:
+        rever.read_SQL('I am not a number!')
+    except AssertionError as err:
+        assert(type(err) == AssertionError)
 
 def test_Cp():
     pass
