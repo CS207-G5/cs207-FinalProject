@@ -14606,7 +14606,15 @@ div#notebook {
 \end{align}</p>
 <p>and $k_{j}$ is the forward reaction rate coefficient.</p>
 <p>In addition, CRRS can handle $N$ species undergoing $M$ <strong>reversible, elementary</strong> reactions, pulling the necessary coefficients from <a href="http://combustion.berkeley.edu/gri_mech/data/nasa_plnm.html">the NASA polynomials database</a>.</p>
-<h4 id="Insert-content-maths-here">Insert content maths here<a class="anchor-link" href="#Insert-content-maths-here">&#182;</a></h4><p><em>Nomenclature Table</em>:</p>
+<p>These reversible reactions allow the package to calculate reaction rates wherein products can react and produce the reactants. For example:
+$$\sum_{i=1}^{N}{\nu_{ij}^{\prime}\mathcal{S}_{i}}  \rightleftharpoons \sum_{i=1}^{N}{\nu_{ij}^{\prime\prime}\mathcal{S}_{i}} \qquad j = 1, \ldots, M$$</p>
+<p>In this case, the progress rate becomes:
+$$r_{j} = k_{j}^{\left(f\right)}\prod_{i=1}^{N}{x_{i}^{\nu_{ij}^{\prime}}} - k_{j}^{\left(b\right)}\prod_{i=1}^{N}{x_{i}^{\nu_{ij}^{\prime\prime}}}, \qquad j = 1,\ldots, M.$$</p>
+<p>Note that this will now require a backwards reaction rate coefficient as well, $k_{j}^{\left(b\right)}$.</p>
+$$k_{j}^{\left(b\right)} = \frac{k_{j}^{\left(f\right)}}{k_{j}^{e}}, \qquad j =1, \ldots, M$$<p>where $k_{j}^{e}$ is the <em>equilibrium coefficient</em> for reaction $j$, calculated as follows:</p>
+$$k_{j}^{e} = \left(\frac{p_{0}}{RT}\right)^{\gamma_{j}}\exp\left(\frac{\Delta S_{j}}{R} - \frac{\Delta H_{j}}{RT}\right), \qquad j =1, \ldots, M$$<p>where $\gamma_{j} = \sum_{i=1}^{N}{\nu_{ij}}$ and $p_{0}$ is the pressure of the reactor, assumed to be $10^{5}$ Pa.</p>
+<p>[ further maths here, from Lecture 16 ]</p>
+<p><em>Nomenclature Table</em>:</p>
 <table>
 <thead><tr>
 <th style="text-align:center">Symbol</th>
@@ -14793,15 +14801,8 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Proposed-upcoming-features">Proposed upcoming features<a class="anchor-link" href="#Proposed-upcoming-features">&#182;</a></h1><h3 id="Non-elementary-reactions">Non-elementary reactions<a class="anchor-link" href="#Non-elementary-reactions">&#182;</a></h3><h4 id="Why?">Why?<a class="anchor-link" href="#Why?">&#182;</a></h4><p>Adding functionality for non-elementary reactions will allow the package to calculate reaction rates wherein products can react and produce the reactants-- a more complex system that may be desirable for users. For example:
-$$\sum_{i=1}^{N}{\nu_{ij}^{\prime}\mathcal{S}_{i}}  \rightleftharpoons \sum_{i=1}^{N}{\nu_{ij}^{\prime\prime}\mathcal{S}_{i}} \qquad j = 1, \ldots, M$$</p>
-<p>In this case, the progress rate becomes:
-$$r_{j} = k_{j}^{\left(f\right)}\prod_{i=1}^{N}{x_{i}^{\nu_{ij}^{\prime}}} - k_{j}^{\left(b\right)}\prod_{i=1}^{N}{x_{i}^{\nu_{ij}^{\prime\prime}}}, \qquad j = 1,\ldots, M.$$</p>
-<p>Note that this will now require a backwards reaction rate coefficient as well, $k_{j}^{\left(b\right)}$. See end of this section for further relevant equations.</p>
-<h4 id="Fitting-into-the-existing-codebase">Fitting into the existing codebase<a class="anchor-link" href="#Fitting-into-the-existing-codebase">&#182;</a></h4><h4 id="New-modules-and-methods">New modules and methods<a class="anchor-link" href="#New-modules-and-methods">&#182;</a></h4><h4 id="Usage-and-dependencies">Usage and dependencies<a class="anchor-link" href="#Usage-and-dependencies">&#182;</a></h4><h3 id="Additional-mathematics">Additional mathematics<a class="anchor-link" href="#Additional-mathematics">&#182;</a></h3><p>For elementary reactions,</p>
-$$k_{j}^{\left(b\right)} = \frac{k_{j}^{\left(f\right)}}{k_{j}^{e}}, \qquad j =1, \ldots, M$$<p>where $k_{j}^{e}$ is the <em>equilibrium coefficient</em> for reaction $j$, calculated as follows:</p>
-$$k_{j}^{e} = \left(\frac{p_{0}}{RT}\right)^{\gamma_{j}}\exp\left(\frac{\Delta S_{j}}{R} - \frac{\Delta H_{j}}{RT}\right), \qquad j =1, \ldots, M$$<p>where $\gamma_{j} = \sum_{i=1}^{N}{\nu_{ij}}$ and $p_{0}$ is the pressure of the reactor, assumed to be $10^{5}$ Pa.</p>
-<p>[ further maths here, from Lecture 16 ]</p>
+<h1 id="Proposed-upcoming-features">Proposed upcoming features<a class="anchor-link" href="#Proposed-upcoming-features">&#182;</a></h1><h3 id="Non-elementary-reactions">Non-elementary reactions<a class="anchor-link" href="#Non-elementary-reactions">&#182;</a></h3><h4 id="Why?">Why?<a class="anchor-link" href="#Why?">&#182;</a></h4><p>Adding functionality for non-elementary reactions will allow the package to calculate reaction rates wherein intermediate steps can occur-- a more complex system that may be desirable for users.</p>
+<h4 id="Fitting-into-the-existing-codebase">Fitting into the existing codebase<a class="anchor-link" href="#Fitting-into-the-existing-codebase">&#182;</a></h4><h4 id="New-modules-and-methods">New modules and methods<a class="anchor-link" href="#New-modules-and-methods">&#182;</a></h4><h4 id="Usage-and-dependencies">Usage and dependencies<a class="anchor-link" href="#Usage-and-dependencies">&#182;</a></h4><h3 id="Additional-mathematics">Additional mathematics<a class="anchor-link" href="#Additional-mathematics">&#182;</a></h3><p>[any equations/formulas can go here]</p>
 
 </div>
 </div>
