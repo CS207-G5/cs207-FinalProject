@@ -16,10 +16,10 @@ client_sp = [ [1,0,0], [0,1,0], [2,0,1], [0,0,1], [0,1,0] ]
 # Tests for basic ElementaryRxn()
 
 def test_rxnrate():
-    assert (all(chemkin.ElementaryRxn('test/rxnrate.xml').rxn_rate(client_x) == [-40., -45.,  85.,   5., -5.]))
+    assert (all(chemkin.ElementaryRxn('test/rxnrate.xml').rxn_rate(client_x, 1200) == [-40., -45.,  85.,   5., -5.]))
 
 def test_onerxn():
-    assert (chemkin.ElementaryRxn('test/onerxn.xml').rxn_rate([1, 2, 4]) == 60.0)
+    assert (chemkin.ElementaryRxn('test/onerxn.xml').rxn_rate([1, 2, 4], 1200) == 60.0)
 
 def test_zerotemp_mod():
     assert(chemkin.reaction_coeffs.mod_arrh(A=10**8, b=0.5, E=5*10**4, T=0) == 0.0)
@@ -54,7 +54,6 @@ def test_creation():
                            [2, -1,  1],
                            [0, -1,  1],
                            [0,  1, -1]]).all())
-    assert((rever.kf == [10, 10, 10]).all())
     assert(rever.p0 == 1.0e+05)
     assert(rever.R == 8.3144598)
     assert((rever.gamma == [0, 0, 0]).all())
