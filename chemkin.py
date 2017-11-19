@@ -182,12 +182,12 @@ class ReversibleRxn(ElementaryRxn):
 # to make sure we do those things correctly...
 
     def __init__(self, filename):
-        super(ElementaryRxn, self, filename).__init__()
+        self.parse(filename)
         self.s = self.specieslist
-        self.r = rxn.r_stoich
-        self.p = rxn.p_stoich
+        self.r = self.r_stoich
+        self.p = self.p_stoich
         self.nuij = self.p - self.r
-        self.kf = np.array(rxn.k)
+        self.kf = np.array(self.k)
         self.p0 = 1.0e+05
         self.R = 8.3144598
         self.gamma = np.sum(self.nuij, axis=0)
@@ -214,6 +214,8 @@ class ReversibleRxn(ElementaryRxn):
                 from HIGH WHERE species_name= ?''',(species_name,)).fetchall()
             coeffs=v[0]
             return coeffs
+
+        assert isinstance(T, numbers.Number), "Please enter a numeric temperature."
 
         db = sqlite3.connect('NASA.sqlite')
         cursor = db.cursor()
