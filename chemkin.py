@@ -272,7 +272,7 @@ class ReversibleRxn(ElementaryRxn):
                 self.kb[i] = self.kf[i] / ke[i]
         print("kb: ", self.kb)
 
-    def progress_rate(self, x, T):
+    def prog_rate(self, x, T):
 
         self.read_SQL(T)
         self.backward_coeffs(T)
@@ -282,7 +282,7 @@ class ReversibleRxn(ElementaryRxn):
         return omega
 
     def rxn_rate(self, x, T):
-        omega = self.progress_rate(x, T)
+        omega = self.prog_rate(x, T)
         return np.sum(omega * self.nuij, axis=1)
 
     def reversible_rxn_rate(x):
