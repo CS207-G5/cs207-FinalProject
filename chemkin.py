@@ -199,7 +199,7 @@ class ReversibleRxn(ElementaryRxn):
             for species in self.s:
                 v=cursor.execute('''SELECT THIGH
                 from LOW WHERE species_name= ?''', (species,)).fetchall()
-                if v[0] > T:
+                if v[0][0] > T:
                     t_range.append('high')
                 else:
                     t_range.append('low')
