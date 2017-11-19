@@ -247,7 +247,6 @@ class ReversibleRxn(ElementaryRxn):
         return S_R
 
     def backward_coeffs(self, T):
-
         # Change in enthalpy and entropy for each reaction
         delta_H_over_RT = np.dot(self.nuij.T, self.H_over_RT(T))
         delta_S_over_R = np.dot(self.nuij.T, self.S_over_R(T))
@@ -257,14 +256,15 @@ class ReversibleRxn(ElementaryRxn):
 
         # Prefactor in Ke
         fact = self.p0 / self.R / T
-
+        print("prefactor in Ke: ", fact)
         # Ke
         ke = fact**self.gamma * np.exp(delta_G_over_RT)
-
+        print("ke: ", ke)
         self.kb = self.kf
-        for i in len(self.kb):
+        for i in range(0, len(self.kb)):
             if self.reversible[i]:
                 self.kb[i] = self.kf[i] / ke[i]
+        print("kb: ", self.kb)
 
     def progress_rate(self, x, T):
 
