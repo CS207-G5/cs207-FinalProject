@@ -1,0 +1,27 @@
+Metadata-Version: 1.1
+Name: chem-G5
+Version: 1.0
+Summary: Elementray reaction and reversible reaction
+Home-page: https://github.com/CS207-G5/cs207-FinalProject
+Author: Brianna, Thomas, Yujiao, Yi
+Author-email: yi_zhai@g.harvard.edu
+License: MIT
+Description-Content-Type: UNKNOWN
+Description: # cs207-FinalProject
+        G5's Final Project for CS207
+        
+        [![Build Status](https://travis-ci.org/CS207-G5/cs207-FinalProject.svg?branch=master)](https://travis-ci.org/CS207-G5/cs207-FinalProject)
+        
+        [![Coverage Status](https://coveralls.io/repos/github/CS207-G5/cs207-FinalProject/badge.png?branch=master&maxAge=0)](https://coveralls.io/github/CS207-G5/cs207-FinalProject?branch=master&maxAge=0)
+        
+        ### TODO
+        * Write tests for the reversible reactions class - Thomas
+        * Packaging - Zhai
+        * Model Doc and proposal - Brianna
+        * Hand-testing tests (testing the tests) - Yujiao
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Topic :: Text Processing :: Linguistic

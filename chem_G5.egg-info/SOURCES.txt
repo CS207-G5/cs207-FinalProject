@@ -1,0 +1,10 @@
+README.md
+setup.py
+chem_G5/__init__.py
+chem_G5/chemkin.py
+chem_G5/reaction_coeffs.py
+chem_G5.egg-info/PKG-INFO
+chem_G5.egg-info/SOURCES.txt
+chem_G5.egg-info/dependency_links.txt
+chem_G5.egg-info/not-zip-safe
+chem_G5.egg-info/top_level.txt

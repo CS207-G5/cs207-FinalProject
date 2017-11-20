@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 import sqlite3
 import doctest
-import reaction_coeffs
+from chem_G5 import reaction_coeffs
 
 
 class ElementaryRxn():
@@ -99,10 +99,10 @@ class ElementaryRxn():
 
         EXAMPLES
         =======
-        >>> ElementaryRxn('test/doctest1.xml').prog_rate([1, 2, 4], 1200)
+        >>> ElementaryRxn('chem_G5/test/doctest1.xml').prog_rate([1, 2, 4], 1200)
         [20.0]
 
-        >>> ElementaryRxn('test/doctest2.xml').prog_rate([1,2,1], 1200)
+        >>> ElementaryRxn('chem_G5/test/doctest2.xml').prog_rate([1,2,1], 1200)
         [40.0, 10.0]
         '''
         k = []
@@ -148,7 +148,7 @@ class ElementaryRxn():
 
         EXAMPLES
         =======
-        >>> ElementaryRxn('test/doctest3.xml').rxn_rate([1,2,1], 1200)
+        >>> ElementaryRxn('chem_G5/test/doctest3.xml').rxn_rate([1,2,1], 1200)
         array([-30., -60.,  20.])
 
         '''
@@ -213,7 +213,7 @@ class ReversibleRxn(ElementaryRxn):
 
         assert isinstance(T, numbers.Number), "Please enter a numeric temperature."
 
-        db = sqlite3.connect('NASA.sqlite')
+        db = sqlite3.connect('chem_G5/data/NASA.sqlite')
         cursor = db.cursor()
         coefs = []
         t_range = choose_t_range(T)
