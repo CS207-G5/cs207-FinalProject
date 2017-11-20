@@ -31,7 +31,6 @@ class ElementaryRxn():
         # later if we might want to specify initial concentrations in the .xml
         #conc_list = list(map(lambda x: float(x),
         #    root.find('phase').find('concentrations').text.strip().split(' ')))
-        # k_list = []
         r_stoich = []
         p_stoich = []
         self.reversible = []
@@ -77,11 +76,7 @@ class ElementaryRxn():
         # specie lie along a column, with each column being another reaction
         self.r_stoich = np.array(r_stoich).transpose()
         self.p_stoich = np.array(p_stoich).transpose()
-        # self.k = k_list
         self.specieslist = specieslist
-        # rxn = chemkin.ElementaryRxn(conc_list, r_stoich, k_list)
-        # print(chemkin.rxn_rate(conc_list, r_stoich, k_list, p_stoich))
-        # return np.array(rxn.rxn_rate(p_stoich))
 
     def prog_rate(self, x, T):
         '''
@@ -174,10 +169,6 @@ class ElementaryRxn():
 
 class ReversibleRxn(ElementaryRxn):
 
-# we should definitely print a lot of things while testing this...
-# we should print out the ke's when they're calculated and also the kb's
-# to make sure we do those things correctly...
-
     def __init__(self, filename):
         self.parse(filename)
         self.s = self.specieslist
@@ -252,10 +243,8 @@ class ReversibleRxn(ElementaryRxn):
 
         # Prefactor in Ke
         fact = self.p0 / self.R / T
-        print("prefactor in Ke: ", fact)
         # Ke
         ke = fact**self.gamma * np.exp(delta_G_over_RT)
-        print("ke: ", ke)
         kf = []
         for elt in self.rxnparams:
             if len(elt) == 1:
@@ -270,7 +259,6 @@ class ReversibleRxn(ElementaryRxn):
         for i in range(len(self.kb)):
             if self.reversible[i]:
                 self.kb[i] = self.kf[i] / ke[i]
-        print("kb: ", self.kb)
 
     def prog_rate(self, x, T):
 
@@ -284,27 +272,6 @@ class ReversibleRxn(ElementaryRxn):
     def rxn_rate(self, x, T):
         omega = self.prog_rate(x, T)
         return np.sum(omega * self.nuij, axis=1)
-
-    def reversible_rxn_rate(x):
-        '''
-        Returns the reaction rate, f, for each specie (listed in x)
-        through one or multiple (number of columns in stoich_r)
-        reversible reactions.
-
-        f = sum(omega_j*nu_ij) for i species in j reactions.
-
-        INPUTS
-        ======
-        x:        numeric list or array
-                  concentrations of reactants
-
-        RETURNS
-        =======
-        f:        the reaction rate for each specie, numeric
-        '''
-        raise NotImplementedError
-
-
 
 class NonelRxn(ElementaryRxn):
     def nonel_rxn_rate(x):
