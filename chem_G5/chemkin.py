@@ -87,6 +87,8 @@ class ElementaryRxn():
         ======
         x:       numeric list
                  concentrations of A, B, C
+        T:        numeric type
+                  temperature of reaction 
 
         RETURNS
         =======
@@ -136,6 +138,8 @@ class ElementaryRxn():
         ======
         x:        numeric list or array
                   concentrations of reactants
+        T:        numeric type
+                  temperature of reaction 
 
         RETURNS
         =======
@@ -234,6 +238,19 @@ class ReversibleRxn(ElementaryRxn):
         return S_R
 
     def backward_coeffs(self, T):
+        '''
+        Returns the backwards reaction coefficients
+
+        INPUTS
+        ======
+        T:        numeric type
+                  temperature of reaction 
+
+        RETURNS
+        =======
+        None (however the backward reaction coefficients have been stored in
+        self.kb after completion)
+        '''
         # Change in enthalpy and entropy for each reaction
         delta_H_over_RT = np.dot(self.nuij.T, self.H_over_RT(T))
         delta_S_over_R = np.dot(self.nuij.T, self.S_over_R(T))
@@ -261,6 +278,21 @@ class ReversibleRxn(ElementaryRxn):
                 self.kb[i] = self.kf[i] / ke[i]
 
     def prog_rate(self, x, T):
+        '''
+        Returns the progress rate for N species going through M
+        reversible, elementary reactions.
+
+        INPUTS
+        ======
+        x:       numeric list
+                 concentrations of A, B, C
+        T:        numeric type
+                  temperature of reaction 
+
+        RETURNS
+        =======
+        omega:   the progress rate for the reaction, numeric
+        '''
 
         self.read_SQL(T)
         self.backward_coeffs(T)
@@ -270,6 +302,25 @@ class ReversibleRxn(ElementaryRxn):
         return omega
 
     def rxn_rate(self, x, T):
+        '''
+        Returns the reaction rate, f, for each specie (listed in x)
+        through one or multiple (number of columns in stoich_r)
+        elementary, irreversible reactions.
+
+        f = sum(omega_j*nu_ij) for i species in j reactions.
+
+        INPUTS
+        ======
+        x:        numeric list or array
+                  concentrations of reactants
+        T:        numeric type
+                  temperature of reaction 
+
+        RETURNS
+        =======
+        f:        the reaction rate for each specie, numeric
+
+        '''
         omega = self.prog_rate(x, T)
         return np.sum(omega * self.nuij, axis=1)
 
