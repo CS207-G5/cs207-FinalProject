@@ -1,6 +1,6 @@
 import sys
 sys.path.append('..')  # Needs to be before chemkin import
-import chemkin
+from chem_G5 import chemkin
 import cmath
 import numpy as np
 
@@ -16,10 +16,10 @@ client_sp = [ [1,0,0], [0,1,0], [2,0,1], [0,0,1], [0,1,0] ]
 # Tests for basic ElementaryRxn()
 
 def test_rxnrate():
-    assert (all(chemkin.ElementaryRxn('test/rxnrate.xml').rxn_rate(client_x, 1200) == [-40., -45.,  85.,   5., -5.]))
+    assert (all(chemkin.ElementaryRxn('chem_G5/test/rxnrate.xml').rxn_rate(client_x, 1200) == [-40., -45.,  85.,   5., -5.]))
 
 def test_onerxn():
-    assert (chemkin.ElementaryRxn('test/onerxn.xml').rxn_rate([1, 2, 4], 1200) == 60.0)
+    assert (chemkin.ElementaryRxn('chem_G5/test/onerxn.xml').rxn_rate([1, 2, 4], 1200) == 60.0)
 
 def test_zerotemp_mod():
     assert(chemkin.reaction_coeffs.mod_arrh(A=10**8, b=0.5, E=5*10**4, T=0) == 0.0)
@@ -36,7 +36,7 @@ def test_complex():
 # Tests for ReversibleRxn()
 
 def test_creation():
-    rever = chemkin.ReversibleRxn('test/rxnrate.xml')
+    rever = chemkin.ReversibleRxn('chem_G5/test/rxnrate.xml')
     assert(rever.s == ['H', 'O', 'OH', 'H2', 'O2'])
     assert((rever.r == [[2,  0,  0],
                         [1,  0,  1],
@@ -58,7 +58,7 @@ def test_creation():
     assert(rever.R == 8.3144598)
     assert((rever.gamma == [0, 0, 0]).all())
 
-rever = chemkin.ReversibleRxn('test/rxnrate.xml')
+rever = chemkin.ReversibleRxn('chem_G5/test/rxnrate.xml')
 
 def test_read_db():
     rever.read_SQL(100)
@@ -101,7 +101,7 @@ def test_backwards_coeffs():
     rever.backward_coeffs(900)
     assert((rever.kb == [10, 10, 10]).all())
 
-rev = chemkin.ReversibleRxn('test/rxns_rev.xml')
+rev = chemkin.ReversibleRxn('chem_G5/test/rxns_rev.xml')
 x=[10,10,10,10]
 
 def test_prog_rate_reversible():
