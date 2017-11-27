@@ -9,11 +9,11 @@ G5's Final Project for CS207
 
 **Tests should be written as these are being completed**:
 * Update the parser (just change Arrhenius to ModifiedArrhenius and do the new
-  three-body stuff)
-* New reaction rates method which will include computation of [M]
+  three-body stuff) - Thomas
+* New reaction rates method which will include computation of [M] - Yujiao
 * Compute the Lindemann form which should be a function: should take a falloff
-  reaction method as an optional parameter
-* Compute one such falloff reaction: Troe falloff function
+  reaction method as an optional parameter - Brianna
+* Compute one such falloff reaction: Troe falloff function - Brianna
 * Examples directory so that we can both present it for the final and also allow
   the user to reproduce an example
-* Documentation
+* Documentation - Zhai
