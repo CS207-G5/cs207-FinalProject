@@ -6,7 +6,14 @@ G5's Final Project for CS207
 [![Coverage Status](https://coveralls.io/repos/github/CS207-G5/cs207-FinalProject/badge.png?branch=master&maxAge=0)](https://coveralls.io/github/CS207-G5/cs207-FinalProject?branch=master&maxAge=0)
 
 ### TODO
-* Write tests for the reversible reactions class - Thomas
-* Packaging - Zhai
-* Model Doc and proposal - Brianna
-* Hand-testing tests (testing the tests) - Yujiao
+
+**Tests should be written as these are being completed**:
+* Update the parser (just change Arrhenius to ModifiedArrhenius and do the new
+  three-body stuff)
+* New reaction rates method which will include computation of [M]
+* Compute the Lindemann form which should be a function: should take a falloff
+  reaction method as an optional parameter
+* Compute one such falloff reaction: Troe falloff function
+* Examples directory so that we can both present it for the final and also allow
+  the user to reproduce an example
+* Documentation
