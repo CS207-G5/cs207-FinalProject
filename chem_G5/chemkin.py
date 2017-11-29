@@ -298,7 +298,7 @@ class ReversibleRxn(ElementaryRxn):
         self.backward_coeffs(T)
         x = np.array(x)
 
-        omega=self.kf*np.product(x**self.r.T)-self.kb*np.product(x**self.p.T)
+        omega=self.kf*np.product(x**self.r.T,axis=1)-self.kb*np.product(x**self.p.T,axis=1)
         return omega
 
     def rxn_rate(self, x, T):
