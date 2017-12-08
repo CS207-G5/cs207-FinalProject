@@ -35,45 +35,149 @@ class ElementaryRxn():
         p_stoich = []
         self.reversible = []
         self.rxnparams = []
+        self.type = []
+        self.efficiencies = []
+        # this loops through each of the reactions in the .xml file
         for reaction in root.find('reactionData').findall('reaction'):
+            # figuring out if the reaction is reversible or not
             if reaction.attrib['reversible'] == 'yes':
                 self.reversible.append(True)
             else:
                 self.reversible.append(False)
-            # the stoichiometric coefficients will be stored in these arrays according
-            # to the ordering given in the variable specieslist
+                # figuring out the type of the reaction (elementary, threebody,
+                # troefalloffthreebody...)
+            self.type.append(reaction.attrib['type'])
+            # the stoichiometric coefficients will be stored in these arrays
+            # according to the ordering given in the variable specieslist
             r_coeffs = [0] * len(specieslist)
             p_coeffs = [0] * len(specieslist)
-            # these 2 lists are the information of specie and stoichiometric coefficient
-            # gleaned from the .xml file
+            # these 2 lists are the information of specie and stoichiometric
+            # coefficient gleaned from the .xml file
             r_list = reaction.find('reactants').text.strip().split(' ')
             p_list = reaction.find('products').text.strip().split(' ')
             for r in r_list:
                 specie_coeff = r.split(':')
-                # this indexing ensures that the same ordering is kept as in specieslist
+                # this indexing ensures that the same ordering is kept as in
+                # specieslist
                 r_coeffs[specieslist.index(specie_coeff[0])] = float(specie_coeff[1])
             for p in p_list:
                 specie_coeff = p.split(':')
                 p_coeffs[specieslist.index(specie_coeff[0])] = float(specie_coeff[1])
             r_stoich.append(r_coeffs)
             p_stoich.append(p_coeffs)
+            # now we begin collecting information about the reaction rate
+            # coefficient(s)
             ratecoeff = reaction.find('rateCoeff')
-            if ratecoeff.find('Arrhenius') is None:
-                # constant rate coeff
-                self.rxnparams.append([reaction_coeffs.const(float(ratecoeff.find('k').text))])
+            # we originally suppose that the type of coefficient is arrhenius,
+            # but if we find this isn't true then we adjust.
+            coefftype = 'Arrhenius'
+            # we handle elementary and threebody reactions similarly.
+            # troefalloffthreebody are handled in the else clause
+            if self.type[-1] == 'Elementary' or self.type[-1] == 'ThreeBody':
+                if ratecoeff.find('k') is not None:
+                    # constant rate coeff
+                    self.rxnparams.append([reaction_coeffs.const(float(ratecoeff.find('k').text))])
+                else:
+                    # either arrhenius or modifiedarrhenius
+                    if ratecoeff.find('Arrhenius') is None:
+                        coefftype = 'modifiedArrhenius'
+                    A = ratecoeff.find(coefftype).find('A')
+                    E = ratecoeff.find(coefftype).find('E')
+                    if A is None:
+                        raise ValueError("A is not found")
+                    if E is None:
+                        raise ValueError("E is not found")
+                    A = float(A.text)
+                    E = float(E.text)
+                    b = ratecoeff.find(coefftype).find('b')
+                    if b is not None:
+                        b = float(b.text)
+                    self.rxnparams.append([A, E, b])
             else:
-                # Arrhenius
-                if ratecoeff.find('Arrhenius').find('A') is None:
-                    raise ValueError("A is not found")
-                if ratecoeff.find('Arrhenius').find('E') is None:
-                    raise ValueError("E is not found")
-                A = float(ratecoeff.find('Arrhenius').find('A').text)
-                E = float(ratecoeff.find('Arrhenius').find('E').text)
-                b = ratecoeff.find('Arrhenius').find('b')
-                self.rxnparams.append([A, E, b])
+                # troefalloffthreebody reaction
+                if ratecoeff.find('Arrhenius') is None:
+                    coefftype = 'modifiedArrhenius'
+                A0 = None
+                E0 = None
+                b0 = None
+                Ainf = None
+                Einf = None
+                binf = None
+                for params in ratecoeff.findall(coefftype):
+                    # this indicates that there is a name attribute, implying
+                    # that this is talking about k0 (kinf doesn't get a name for
+                    # some silly reason
+                    if len(params.attrib) != 0:
+                        A0 = params.find('A')
+                        E0 = params.find('E')
+                        if A0 is None:
+                            raise ValueError("A is not found")
+                        if E0 is None:
+                            raise ValueError("E is not found")
+                        A0 = float(A0.text)
+                        E0 = float(E0.text)
+                        b0 = params.find('b')
+                        if b0 is not None:
+                            b0 = float(b0.text)
+                    else:
+                        Ainf = params.find('A')
+                        Einf = params.find('E')
+                        if Ainf is None:
+                            raise ValueError("A is not found")
+                        if Einf is None:
+                            raise ValueError("E is not found")
+                        Ainf = float(Ainf.text)
+                        Einf = float(Einf.text)
+                        binf = params.find('b')
+                        if binf is not None:
+                            binf = float(binf.text)
+                troe = ratecoeff.find('Troe')
+                alpha = troe.find('alpha')
+                T1 = troe.find('T1')
+                T2 = troe.find('T2')
+                T3 = troe.find('T3')
+                if alpha is None:
+                    raise ValueError('alpha is not found')
+                if T1 is None:
+                    raise ValueError('T1 is not found')
+                if T2 is None:
+                    T2 = 0
+                else:
+                    T2 = float(T2.text)
+                if T3 is None:
+                    raise ValueError('T3 is not found')
+                T1 = float(T1.text)
+                T3 = float(T3.text)
+                alpha = float(alpha.text)
+                self.rxnparams.append([A0, E0, b0, Ainf, Einf, binf, alpha,
+                    T1, T2, T3])
+            # collecting the efficiencies (not applicable for elementary
+            # reactions)
+            xmleff = ratecoeff.find('efficiencies')
+            if xmleff is None:
+                self.efficiencies.append(None)
+            else:
+                e = list(map(lambda x: x.split(':'),
+                    xmleff.text.strip().split(' ')))
+                ef = []
+                default = float(xmleff.attrib['default'])
+                # this matches the efficiency with the entry in specieslist. if
+                # an entry in specieslist exists but is not found in xmleff,
+                # then the default value of xmleff is used
+                for s in specieslist:
+                    found = False
+                    for elt in e:
+                        if s == elt[0]:
+                            ef.append(float(elt[1]))
+                            found = True
+                            break
+                    if not found:
+                        ef.append(default)
+                self.efficiencies.append(ef)
 
-        # the transpose here is just to have the stoichiometric coefficients for each
-        # specie lie along a column, with each column being another reaction
+        # the transpose here is just to have the stoichiometric coefficients for
+        # each specie lie along a column, with each column being another
+        # reaction
         self.r_stoich = np.array(r_stoich).transpose()
         self.p_stoich = np.array(p_stoich).transpose()
         self.specieslist = specieslist
@@ -110,7 +214,7 @@ class ElementaryRxn():
                 k.append(reaction_coeffs.arrh(elt[0], elt[1], T))
             else:
                 k.append(reaction_coeffs.mod_arrh(elt[0],
-                    float(elt[2].text), elt[1], T))
+                    elt[2], elt[1], T))
         x = np.array(x)
         stoich = np.array(self.r_stoich)
         k = np.array(k)
@@ -270,7 +374,7 @@ class ReversibleRxn(ElementaryRxn):
                 kf.append(reaction_coeffs.arrh(elt[0], elt[1], T))
             else:
                 kf.append(reaction_coeffs.mod_arrh(elt[0],
-                    float(elt[2].text), elt[1], T))
+                    elt[2], elt[1], T))
         self.kf = np.array(kf)
         self.kb = np.copy(self.kf)
         for i in range(len(self.kb)):

@@ -33,6 +33,11 @@ def test_complex():
     except ValueError as err:
         assert(type(err) == ValueError)
 
+def test_parse_nonelem():
+    r = chemkin.ElementaryRxn('chem_G5/test/parse_nonelem.xml')
+    assert (r.efficiencies == [[2.5, 12.0, 1.0, 1.0, 1.0], [2.0, 11.0, 1.0, 0.78, 1.0]])
+    assert (r.rxnparams == [[4.577e+19, 104380.0, -1.4], [6.366e+20, 524.8, -1.72, 1475000000000.0, 0.0, 0.6, 0.8, 1e+30, 1e+30, 1e-30]])
+
 # Tests for ReversibleRxn()
 
 def test_creation():
