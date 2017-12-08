@@ -13,11 +13,11 @@
         <reaction reversible="yes" type="Elementary" id="reaction01">
             <equation>H + O2 [=] OH + O</equation>
             <rateCoeff>
-                <Arrhenius>
+                <modifiedArrhenius>
                     <A units="m3/mol/s">3.52e+10</A>
                     <b>-0.7</b>
                     <E units="J/mol">7.14e+04</E>
-                </Arrhenius>
+                </modifiedArrhenius>
             </rateCoeff>
             <reactants>H:1 O2:1</reactants>
             <products>OH:1 O:1</products>
