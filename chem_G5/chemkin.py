@@ -444,11 +444,6 @@ class NonelRxn(ElementaryRxn):
         through one or multiple (number of columns in stoich_r)
         nonelementary reactions.
 
-
-
-    # Inherits __init__ from ElementaryRxn
-
-
         f = sum(omega_j*nu_ij) for i species in j reactions.
 
         INPUTS
@@ -466,8 +461,11 @@ class NonelRxn(ElementaryRxn):
     def rate_coeff(self, T):
         # in: self and temperature
         # out: k0, kinf
-        k0 = reaction_coeffs.arrh(self.rxnparams[0:2], T)
-        kinf = reaction_coeffs.arrh(self.rxnparams[3:5], T)
+        k0 = []
+        kinf = []
+        for elt in self.rxnparams:
+            k0.append(reaction_coeffs.arrh(elt[0], elt[1], T))
+            kinf.append(reaction_coeffs.arrh(elt[3], elt[4], T))
         return (k0, kinf)
 
     def tb_rxn_coeff(self, T):
@@ -476,15 +474,25 @@ class NonelRxn(ElementaryRxn):
 
         # Method should be regular ThreeBody or TroeFalloff if the user is instantiating this class; however, it will still return a regular k if the reaction type is elementary.
 
-        k0, kinf = self.rate_coeff(T)
-        Pr = (k0*self.M)/kinf
+        k_f = []
         if self.type == "TroeFalloffThreeBody":
-            k_f = (kinf*Pr)/(1 + Pr) * self.Troe_falloff(T, Pr)
+            k0, kinf = self.rate_coeff(T)
+            Pr = []
+            for i, k in enumerate(k0):
+                Pr.append((k*self.M)/kinf[i])
+
+            falloffs = self.Troe_falloff(T, Pr)
+
+            for i, pr in enumerate(Pr):
+                k_f.append((kinf[i]*pr)/(1 + pr) * falloffs[i])
+
         elif self.type == "ThreeBody":
-            k_f = (k0*self.M)/(1+(k0*self.M)/kinf)
+            k_f = []
+            for i, k in enumerate(k0):
+                k_f.append((k*self.M)/(1+(k*self.M)/kinf[i]))
+
         else:
             # This is an elementary reaction now so we'll do it the usual way.
-            k_f = []
             for elt in self.rxnparams:
                 if len(elt) == 1:
                     k_f.append(elt[0])
@@ -502,16 +510,18 @@ class NonelRxn(ElementaryRxn):
 
         # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
         #                                  alpha, T1, T2, T3]
-        A = self.rxnparams[7]
-        T1 = self.rxnparams[8]
-        T2 = self.rxnparams[9]
-        T3 = self.rxnparams[10]
+        falloff = []
+        for elt in self.rxnparams:
+            A = elt[7]
+            T1 = elt[8]
+            T2 = elt[9]
+            T3 = elt[10]
 
-        Fcent = (1 - A) * np.exp(-T/T3) + A * np.exp(-T/T1) + np.exp(-T2/T)
-        C = -0.4 - 0.67 * np.log10(Fcent)
-        N = 0.75 - 1.27 * np.log10(Fcent)
-        f1 = (np.log10(Pr) + C) / N - 0.14 * (np.log10(Pr) + C)
-        log10falloff = np.log10(Fcent)/(1+f1**2)
-        falloff = 10**log10falloff
+            Fcent = (1 - A) * np.exp(-T/T3) + A * np.exp(-T/T1) + np.exp(-T2/T)
+            C = -0.4 - 0.67 * np.log10(Fcent)
+            N = 0.75 - 1.27 * np.log10(Fcent)
+            f1 = (np.log10(Pr) + C) / N - 0.14 * (np.log10(Pr) + C)
+            log10falloff = np.log10(Fcent)/(1+f1**2)
+            falloff.append(10**log10falloff)
 
         return falloff
