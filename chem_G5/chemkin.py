@@ -513,22 +513,3 @@ class NonelRxn(ElementaryRxn):
         falloff = 10**log10falloff
 
         return falloff
-
-    def nonel_rxn_rate(x):
-        '''
-        Returns the reaction rate, f, for each specie (listed in x)
-        through one or multiple (number of columns in stoich_r)
-        nonelementary reactions.
-
-        f = sum(omega_j*nu_ij) for i species in j reactions.
-
-        INPUTS
-        ======
-        x:        numeric list or array
-                  concentrations of reactants
-
-        RETURNS
-        =======
-        f:        the reaction rate for each specie, numeric
-        '''
-        raise NotImplementedError
