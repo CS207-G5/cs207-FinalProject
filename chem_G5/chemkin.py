@@ -507,6 +507,17 @@ class NonelRxn(ElementaryRxn):
         omega=kf*np.product(x**r.T,axis=1)*self.M
         return omega
 
+    def tb_rxn_rate()
+        p_stoich = np.array(self.p_stoich)
+        r_stoich = np.array(self.r_stoich)
+
+        omega = self.tb_prog_rate(x, T)
+
+        if np.shape(p_stoich)[1] == 1: # Handle the one-reaction case
+            return np.sum(omega * (p_stoich - r_stoich))
+        else:
+            return np.sum(omega * (p_stoich - r_stoich), axis=1)
+            
     def Troe_falloff(self, T, Pr):
         # See documentation for equations of the Troe falloff function.
         # Pr is the non-dimensional reduced pressure, defined in tb_rxn_coeff.
