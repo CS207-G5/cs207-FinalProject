@@ -115,3 +115,7 @@ def test_prog_rate_reversible():
 def test_rxnrate_reversible():
     np.testing.assert_allclose(rev.rxn_rate(x,1200),[ 1.22703266e+09,   1.22703266e+09,  -1.22703266e+09,
         -1.22703266e+09])
+
+# Tests for NonelRxn
+def test_Nonel():
+  threebody = chemkin.NonelRxn('chem_G5/test/parse_nonelem.xml')
