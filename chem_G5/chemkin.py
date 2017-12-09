@@ -446,5 +446,6 @@ class NonelRxn(ElementaryRxn):
         =======
         f:        the reaction rate for each specie, numeric
         '''
+        self.M=np.dot(self.efficiencies,x)
         raise NotImplementedError
 
