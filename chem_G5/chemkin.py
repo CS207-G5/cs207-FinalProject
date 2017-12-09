@@ -192,7 +192,7 @@ class ElementaryRxn():
         x:       numeric list
                  concentrations of A, B, C
         T:        numeric type
-                  temperature of reaction 
+                  temperature of reaction
 
         RETURNS
         =======
@@ -243,7 +243,7 @@ class ElementaryRxn():
         x:        numeric list or array
                   concentrations of reactants
         T:        numeric type
-                  temperature of reaction 
+                  temperature of reaction
 
         RETURNS
         =======
@@ -348,7 +348,7 @@ class ReversibleRxn(ElementaryRxn):
         INPUTS
         ======
         T:        numeric type
-                  temperature of reaction 
+                  temperature of reaction
 
         RETURNS
         =======
@@ -391,7 +391,7 @@ class ReversibleRxn(ElementaryRxn):
         x:       numeric list
                  concentrations of A, B, C
         T:        numeric type
-                  temperature of reaction 
+                  temperature of reaction
 
         RETURNS
         =======
@@ -418,7 +418,7 @@ class ReversibleRxn(ElementaryRxn):
         x:        numeric list or array
                   concentrations of reactants
         T:        numeric type
-                  temperature of reaction 
+                  temperature of reaction
 
         RETURNS
         =======
@@ -449,3 +449,30 @@ class NonelRxn(ElementaryRxn):
         self.M=np.dot(self.efficiencies,x)
         raise NotImplementedError
 
+class ThreeBodyRxn(ElementaryRxn):
+    # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
+    #                                  alpha, T1, T2, T3]
+
+    # Inherits __init__ from ElementaryRxn
+
+    def rate_coeff(self, T):
+        # in: self and temperature
+        # out: k0, kinf
+        k0 = reaction_coeffs.arrh(self.rxnparams[0:2], T)
+        kinf = reaction_coeffs.arrh(self.rxnparams[3:5], T)
+        return [k0, kinf]
+
+    def tb_rxn_coeff(self, M, T, method = "Troe"):
+        k0, kinf = self.rate_coeff(T)
+        Pr = (k0*M)/kinf
+        k_f = (kinf*Pr)/(1 + Pr) * self.Troe_falloff(T)
+        pass
+
+    def Troe_falloff(self):
+        falloff = 5
+
+        return falloff
+
+    def tb_rxn_rate(x):
+        # Yujiao is implementing this
+        pass
