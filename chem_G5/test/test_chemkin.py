@@ -117,5 +117,7 @@ def test_rxnrate_reversible():
         -1.22703266e+09])
 
 # Tests for NonelRxn
-def test_Nonel():
-  threebody = chemkin.NonelRxn('chem_G5/test/parse_nonelem.xml')
+def test_threebody_rxncoeff():
+    threebody = chemkin.NonelRxn('chem_G5/test/parse_nonelem.xml')
+    assert(np.all(np.isclose(threebody.tb_rxn_coeff(1000),
+      np.array([10611626727.74805, 4135629685098265.0]))))
