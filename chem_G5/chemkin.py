@@ -434,10 +434,6 @@ class NonelRxn(ElementaryRxn):
 
     # Inherits __init__ from ElementaryRxn
 
-    def three_body_prog_rate(self, x, T):
-        self.M=np.dot(self.efficiencies,x)
-        return self.prog_rate(x,T)*self.M
-
     def nonel_rxn_rate(x):
         '''
         Returns the reaction rate, f, for each specie (listed in x)
@@ -503,6 +499,13 @@ class NonelRxn(ElementaryRxn):
                         elt[2], elt[1], T))
 
         return k_f
+
+    def tb_prog_rate(self, x, T):
+        self.M=np.dot(self.efficiencies,x)
+        r=np.array(self.r_stoich)
+        kf=self.tb_rxn_coeff(T)
+        omega=kf*np.product(x**r.T,axis=1)*self.M
+        return omega
 
     def Troe_falloff(self, T, Pr):
         # See documentation for equations of the Troe falloff function.
