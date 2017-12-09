@@ -444,8 +444,7 @@ class NonelRxn(ElementaryRxn):
         through one or multiple (number of columns in stoich_r)
         nonelementary reactions.
 
-        # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
-    #                                  alpha, T1, T2, T3]
+
 
     # Inherits __init__ from ElementaryRxn
 
@@ -461,7 +460,7 @@ class NonelRxn(ElementaryRxn):
         =======
         f:        the reaction rate for each specie, numeric
         '''
-        self.M=np.dot(self.efficiencies,x)
+
         raise NotImplementedError
 
     def rate_coeff(self, T):
@@ -500,6 +499,9 @@ class NonelRxn(ElementaryRxn):
     def Troe_falloff(self, T, Pr):
         # See documentation for equations of the Troe falloff function.
         # Pr is the non-dimensional reduced pressure, defined in tb_rxn_coeff.
+
+        # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
+        #                                  alpha, T1, T2, T3]
         A = self.rxnparams[7]
         T1 = self.rxnparams[8]
         T2 = self.rxnparams[9]
