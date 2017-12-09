@@ -429,6 +429,12 @@ class ReversibleRxn(ElementaryRxn):
         return np.sum(omega * self.nuij, axis=1)
 
 class NonelRxn(ElementaryRxn):
+
+    def three_body_prog_rate(self, x, T):
+        self.M=np.dot(self.efficiencies,x)
+        return self.prog_rate(x,T)*self.M
+
+
     def nonel_rxn_rate(x):
         '''
         Returns the reaction rate, f, for each specie (listed in x)
@@ -446,6 +452,5 @@ class NonelRxn(ElementaryRxn):
         =======
         f:        the reaction rate for each specie, numeric
         '''
-        self.M=np.dot(self.efficiencies,x)
         raise NotImplementedError
 
