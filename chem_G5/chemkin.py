@@ -429,11 +429,90 @@ class ReversibleRxn(ElementaryRxn):
         return np.sum(omega * self.nuij, axis=1)
 
 class NonelRxn(ElementaryRxn):
+    # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
+    #                                  alpha, T1, T2, T3]
+
+    # Inherits __init__ from ElementaryRxn
 
     def three_body_prog_rate(self, x, T):
         self.M=np.dot(self.efficiencies,x)
         return self.prog_rate(x,T)*self.M
 
+    def nonel_rxn_rate(x):
+        '''
+        Returns the reaction rate, f, for each specie (listed in x)
+        through one or multiple (number of columns in stoich_r)
+        nonelementary reactions.
+
+        # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
+    #                                  alpha, T1, T2, T3]
+
+    # Inherits __init__ from ElementaryRxn
+
+
+        f = sum(omega_j*nu_ij) for i species in j reactions.
+
+        INPUTS
+        ======
+        x:        numeric list or array
+                  concentrations of reactants
+
+        RETURNS
+        =======
+        f:        the reaction rate for each specie, numeric
+        '''
+        self.M=np.dot(self.efficiencies,x)
+        raise NotImplementedError
+
+    def rate_coeff(self, T):
+        # in: self and temperature
+        # out: k0, kinf
+        k0 = reaction_coeffs.arrh(self.rxnparams[0:2], T)
+        kinf = reaction_coeffs.arrh(self.rxnparams[3:5], T)
+        return (k0, kinf)
+
+    def tb_rxn_coeff(self, T):
+        # in: self and temperature
+        # out: forward reaction rate coefficient at the given temperature
+
+        # Method should be regular ThreeBody or TroeFalloff if the user is instantiating this class; however, it will still return a regular k if the reaction type is elementary.
+
+        k0, kinf = self.rate_coeff(T)
+        Pr = (k0*self.M)/kinf
+        if self.type == "TroeFalloffThreeBody":
+            k_f = (kinf*Pr)/(1 + Pr) * self.Troe_falloff(T, Pr)
+        elif self.type == "ThreeBody":
+            k_f = (k0*self.M)/(1+(k0*self.M)/kinf)
+        else:
+            # This is an elementary reaction now so we'll do it the usual way.
+            k_f = []
+            for elt in self.rxnparams:
+                if len(elt) == 1:
+                    k_f.append(elt[0])
+                elif elt[2] is None:
+                    k_f.append(reaction_coeffs.arrh(elt[0], elt[1], T))
+                else:
+                    k_f.append(reaction_coeffs.mod_arrh(elt[0],
+                        elt[2], elt[1], T))
+
+        return k_f
+
+    def Troe_falloff(self, T, Pr):
+        # See documentation for equations of the Troe falloff function.
+        # Pr is the non-dimensional reduced pressure, defined in tb_rxn_coeff.
+        A = self.rxnparams[7]
+        T1 = self.rxnparams[8]
+        T2 = self.rxnparams[9]
+        T3 = self.rxnparams[10]
+
+        Fcent = (1 - A) * np.exp(-T/T3) + A * np.exp(-T/T1) + np.exp(-T2/T)
+        C = -0.4 - 0.67 * np.log10(Fcent)
+        N = 0.75 - 1.27 * np.log10(Fcent)
+        f1 = (np.log10(Pr) + C) / N - 0.14 * (np.log10(Pr) + C)
+        log10falloff = np.log10(Fcent)/(1+f1**2)
+        falloff = 10**log10falloff
+
+        return falloff
 
     def nonel_rxn_rate(x):
         '''
@@ -453,31 +532,3 @@ class NonelRxn(ElementaryRxn):
         f:        the reaction rate for each specie, numeric
         '''
         raise NotImplementedError
-
-class ThreeBodyRxn(ElementaryRxn):
-    # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
-    #                                  alpha, T1, T2, T3]
-
-    # Inherits __init__ from ElementaryRxn
-
-    def rate_coeff(self, T):
-        # in: self and temperature
-        # out: k0, kinf
-        k0 = reaction_coeffs.arrh(self.rxnparams[0:2], T)
-        kinf = reaction_coeffs.arrh(self.rxnparams[3:5], T)
-        return [k0, kinf]
-
-    def tb_rxn_coeff(self, M, T, method = "Troe"):
-        k0, kinf = self.rate_coeff(T)
-        Pr = (k0*M)/kinf
-        k_f = (kinf*Pr)/(1 + Pr) * self.Troe_falloff(T)
-        pass
-
-    def Troe_falloff(self):
-        falloff = 5
-
-        return falloff
-
-    def tb_rxn_rate(x):
-        # Yujiao is implementing this
-        pass
