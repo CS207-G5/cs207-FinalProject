@@ -507,7 +507,7 @@ class NonelRxn(ElementaryRxn):
         omega=kf*np.product(x**r.T,axis=1)*self.M
         return omega
 
-    def tb_rxn_rate()
+    def tb_rxn_rate(self, x, T):
         p_stoich = np.array(self.p_stoich)
         r_stoich = np.array(self.r_stoich)
 
@@ -534,7 +534,7 @@ class NonelRxn(ElementaryRxn):
             Fcent = (1 - A) * np.exp(-T/T3) + A * np.exp(-T/T1) + np.exp(-T2/T)
             C = -0.4 - 0.67 * np.log10(Fcent)
             N = 0.75 - 1.27 * np.log10(Fcent)
-            f1 = (np.log10(Pr) + C) / N - 0.14 * (np.log10(Pr) + C)
+            f1 = (np.log10(Pr) + C) / (N - 0.14 * (np.log10(Pr) + C))
             log10falloff = np.log10(Fcent)/(1+f1**2)
             falloff.append(10**log10falloff)
 
