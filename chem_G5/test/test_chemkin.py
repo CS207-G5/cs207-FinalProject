@@ -121,3 +121,13 @@ def test_threebody_rxncoeff():
     threebody = chemkin.NonelRxn('chem_G5/test/parse_nonelem.xml')
     assert(np.all(np.isclose(threebody.tb_rxn_coeff(1000),
       np.array([10611626727.74805, 4135629685098265.0]))))
+
+def test_threebody_prog_rate():
+    threebody = chemkin.NonelRxn('chem_G5/test/parse_nonelem.xml')
+    assert(np.all(np.isclose(threebody.tb_prog_rate([1,2,3,4,5],1000),
+      np.array([  4.08547629e+11,   1.74291977e+18]))))
+
+def test_threebody_rxn_rate():
+    threebody = chemkin.NonelRxn('chem_G5/test/parse_nonelem.xml')
+    assert(np.all(np.isclose(threebody.tb_rxn_rate([1,2,3,4,5],1000),
+      np.array([ -4.08547629e+11,   0.00000000e+00,  -1.74291896e+18, -1.74291977e+18,   1.74291977e+18]))))
