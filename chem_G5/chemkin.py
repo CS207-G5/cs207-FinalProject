@@ -432,49 +432,46 @@ class NonelRxn(ElementaryRxn):
     # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
     #                                  alpha, T1, T2, T3]
 
-    def rate_coeff(self, T):
+    def rate_coeff(self, T, parameters):
         # in: self and temperature
         # out: k0, kinf
         k0 = []
         kinf = []
-        for elt in self.rxnparams:
-            k0.append(reaction_coeffs.arrh(elt[0], elt[1], T))
-            kinf.append(reaction_coeffs.arrh(elt[3], elt[4], T))
+        k0.append(reaction_coeffs.arrh(parameters[0], parameters[1], T))
+        kinf.append(reaction_coeffs.arrh(parameters[3], parameters[4], T))
         return (k0, kinf)
 
-    def tb_rxn_coeff(self, T):
+    def tb_rxn_coeff(self, x, T):
         # in: self and temperature
         # out: forward reaction rate coefficient at the given temperature
 
         # Method should be regular ThreeBody or TroeFalloff if the user is instantiating this class; however, it will still return a regular k if the reaction type is elementary.
 
         k_f = []
-        if self.type == "TroeFalloffThreeBody":
-            k0, kinf = self.rate_coeff(T)
-            Pr = []
-            for i, k in enumerate(k0):
-                Pr.append((k*self.M)/kinf[i])
+        for rxn_i, value in enumerate(self.type):
+            if value == "TroeFalloffThreeBody":
+                k0, kinf = self.rate_coeff(T, self.rxnparams[rxn_i])
+                Pr = []
+                for i, k in enumerate(k0):
+                    M = np.dot(self.efficiencies, x)
+                    Pr.append((k*M[rxn_i])/kinf[i])
 
-            falloffs = self.Troe_falloff(T, Pr)
+                falloffs = self.Troe_falloff(T, Pr, self.rxnparams[rxn_i])
 
-            for i, pr in enumerate(Pr):
-                k_f.append((kinf[i]*pr)/(1 + pr) * falloffs[i])
+                for i, pr in enumerate(Pr):
+                    k_f.append((kinf[i]*pr)/(1 + pr) * falloffs[i])
 
-        elif self.type == "ThreeBody":
-            k_f = []
-            for i, k in enumerate(k0):
-                k_f.append((k*self.M)/(1+(k*self.M)/kinf[i]))
-
-        else:
-            # This is an elementary reaction now so we'll do it the usual way.
-            for elt in self.rxnparams:
+            else:
+                # If it's a regular three-body or an elementary reaction,
+                # we can handle it the usual way.
+                elt = self.rxnparams[rxn_i]
                 if len(elt) == 1:
                     k_f.append(elt[0])
                 elif elt[2] is None:
                     k_f.append(reaction_coeffs.arrh(elt[0], elt[1], T))
                 else:
                     k_f.append(reaction_coeffs.mod_arrh(elt[0],
-                        elt[2], elt[1], T))
+                               elt[2], elt[1], T))
 
         return k_f
 
@@ -493,28 +490,27 @@ class NonelRxn(ElementaryRxn):
                 self.M.append(current)
 
         r=np.array(self.r_stoich)
-        kf=self.tb_rxn_coeff(T)
+        kf=self.tb_rxn_coeff(x, T)
         omega=kf*np.product(x**r.T,axis=1)*self.M
         return omega
 
-    def Troe_falloff(self, T, Pr):
+    def Troe_falloff(self, T, Pr, parameters):
         # See documentation for equations of the Troe falloff function.
         # Pr is the non-dimensional reduced pressure, defined in tb_rxn_coeff.
 
         # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
         #                                  alpha, T1, T2, T3]
         falloff = []
-        for elt in self.rxnparams:
-            A = elt[7]
-            T1 = elt[8]
-            T2 = elt[9]
-            T3 = elt[10]
+        A = parameters[6]
+        T1 = parameters[7]
+        T2 = parameters[8]
+        T3 = parameters[9]
 
-            Fcent = (1 - A) * np.exp(-T/T3) + A * np.exp(-T/T1) + np.exp(-T2/T)
-            C = -0.4 - 0.67 * np.log10(Fcent)
-            N = 0.75 - 1.27 * np.log10(Fcent)
-            f1 = (np.log10(Pr) + C) / (N - 0.14 * (np.log10(Pr) + C))
-            log10falloff = np.log10(Fcent)/(1+f1**2)
-            falloff.append(10**log10falloff)
+        Fcent = (1 - A) * np.exp(-T/T3) + A * np.exp(-T/T1) + np.exp(-T2/T)
+        C = -0.4 - 0.67 * np.log10(Fcent)
+        N = 0.75 - 1.27 * np.log10(Fcent)
+        f1 = (np.log10(Pr) + C) / (N - 0.14 * (np.log10(Pr) + C))
+        log10falloff = np.log10(Fcent)/(1+f1**2)
+        falloff = 10**log10falloff
 
         return falloff
