@@ -13,6 +13,11 @@ k3 = [chemkin.reaction_coeffs.arrh(A=10**7, E=10**4, T=i) for i in client_temps]
 client_sr = [ [2,0,0], [1,0,1], [0,1,0], [0,1,0], [0,0,1] ]
 client_sp = [ [1,0,0], [0,1,0], [2,0,1], [0,0,1], [0,1,0] ]
 
+# Test for __str__ method
+def test_print():
+  r = chemkin.ElementaryRxn('chem_G5/test/onerxn.xml').rxn_rate([1,2,4], 1200)
+  print(r)
+
 # Tests for basic ElementaryRxn()
 
 def test_rxnrate():
