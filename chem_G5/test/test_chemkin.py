@@ -150,5 +150,12 @@ def test_threebody_rxn_rate_2():
                 -6024003.75378911,  -981913.80565292]))))
 
 
+def test_el_nonel_rxn_rate():
+    tb = chemkin.NonelRxn('chem_G5/test/elemandnonelem.xml')
+    assert(np.all(np.isclose(tb.rxn_rate([1, 2, 3, 4, 5], 1000), 
+        np.array([ -3.92193332e+13,  -7.76215711e+13,  -5.81635300e+14,
+        -6.21263181e+14,   6.21263181e+14]))))
+
+
 
 

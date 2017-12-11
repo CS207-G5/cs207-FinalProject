@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!-- Reaction rate parameters from: -->
+<!-- Yoo 2009 -->
+<ctml>
+
+  <phase>
+    <speciesArray>H2 H2O H O2 HO2</speciesArray>
+  </phase>
+
+  <reactionData id="hydrogen_air_mechanism">
+
+    <reaction reversible="yes" type="ThreeBody" id="reaction05">
+    <!-- reaction 05  -->
+      <equation>H2 + M [=] H + H + M</equation>
+      <rateCoeff>
+        <modifiedArrhenius>
+          <A units="cm3/mol/s">4.577e+19</A>
+          <b>-1.4</b>
+          <E units="cal/mol">1.0438e+05</E>
+        </modifiedArrhenius>
+        <efficiencies default="1.0">H2:2.5 H2O:12.0 </efficiencies>
+      </rateCoeff>
+      <reactants>H2:1</reactants>
+      <products>H:2</products>
+    </reaction>
+
+    <reaction reversible="yes" type="TroeFalloffThreeBody" id="reaction09">
+      <equation>H + O2 + M [=] HO2 + M</equation>
+      <rateCoeff>
+        <modifiedArrhenius name="k0">
+           <A units="cm6/mol2/s">6.366e+20</A>
+           <b>-1.72</b>
+           <E units="cal/mol">5.248e+02</E>
+        </modifiedArrhenius>
+        <modifiedArrhenius>
+           <A units="cm3/mol/s">1.475e+12</A>
+           <b>0.60</b>
+           <E units="cal/mol">0.0</E>
+        </modifiedArrhenius>
+        <Troe>
+          <alpha> 0.8 </alpha>
+          <T1>1.0e+30</T1>
+          <T2>1.0e+30</T2>
+          <T3>1.0e-30</T3>
+        </Troe>
+        <efficiencies default="1.0">H2:2.0 H2O:11.0 O2:0.78</efficiencies>
+      </rateCoeff>
+      <reactants>H:1 O2:1</reactants>
+      <products>HO2:1</products>
+    </reaction>
+
+    <reaction reversible="yes" type="Elementary" id="reaction03">
+    <!-- reaction 03  -->
+      <equation>H2 + OH [=] H2O + H</equation>
+      <rateCoeff>
+        <modifiedArrhenius>
+          <A units="cm3/mol/s">2.16e+08</A>
+          <b>1.51</b>
+          <E units="cal/mol">3.43e+03</E>
+        </modifiedArrhenius>
+      </rateCoeff>
+      <reactants>H2:1 H2O:3</reactants>
+      <products>H2O:1 H:1</products>
+    </reaction>
+
+  </reactionData>
+</ctml>

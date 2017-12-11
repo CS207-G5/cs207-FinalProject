@@ -37,27 +37,25 @@ class ElementaryRxn():
         self.rxnparams = []
         self.type = []
         self.efficiencies = []
-        # this loops through each of the reactions in the .xml file
+        # Loop through each reaction in the .xml file
         for reaction in root.find('reactionData').findall('reaction'):
-            # figuring out if the reaction is reversible or not
+            # Is it reversible?
             if reaction.attrib['reversible'] == 'yes':
                 self.reversible.append(True)
             else:
                 self.reversible.append(False)
-                # figuring out the type of the reaction (elementary, threebody,
-                # troefalloffthreebody...)
+                # Set reaction type (elementary, reversible, 3body, etc.)
             self.type.append(reaction.attrib['type'])
-            # the stoichiometric coefficients will be stored in these arrays
+            # Stoichiometric coefficients will be stored in these arrays
             # according to the ordering given in the variable specieslist
             r_coeffs = [0] * len(specieslist)
             p_coeffs = [0] * len(specieslist)
-            # these 2 lists are the information of specie and stoichiometric
-            # coefficient gleaned from the .xml file
+            # Lists of specie and stoichiometric coefficients from .xml file
             r_list = reaction.find('reactants').text.strip().split(' ')
             p_list = reaction.find('products').text.strip().split(' ')
             for r in r_list:
                 specie_coeff = r.split(':')
-                # this indexing ensures that the same ordering is kept as in
+                # This indexing ensures that the same ordering is kept as in
                 # specieslist
                 r_coeffs[specieslist.index(specie_coeff[0])] = float(specie_coeff[1])
             for p in p_list:
@@ -65,20 +63,19 @@ class ElementaryRxn():
                 p_coeffs[specieslist.index(specie_coeff[0])] = float(specie_coeff[1])
             r_stoich.append(r_coeffs)
             p_stoich.append(p_coeffs)
-            # now we begin collecting information about the reaction rate
-            # coefficient(s)
+            # Collect information about the reaction rate coefficient(s)
             ratecoeff = reaction.find('rateCoeff')
-            # we originally suppose that the type of coefficient is arrhenius,
+            # We originally suppose that the type of coefficient is Arrhenius,
             # but if we find this isn't true then we adjust.
             coefftype = 'Arrhenius'
-            # we handle elementary and threebody reactions similarly.
-            # troefalloffthreebody are handled in the else clause
+            # We handle elementary and threebody reactions similarly.
+            # Troe falloff threebody are handled in the else clause
             if self.type[-1] == 'Elementary' or self.type[-1] == 'ThreeBody':
                 if ratecoeff.find('k') is not None:
-                    # constant rate coeff
+                    # Constant rate coeff
                     self.rxnparams.append([reaction_coeffs.const(float(ratecoeff.find('k').text))])
                 else:
-                    # either arrhenius or modifiedarrhenius
+                    # Either Arrhenius or modified Arrhenius
                     if ratecoeff.find('Arrhenius') is None:
                         coefftype = 'modifiedArrhenius'
                     A = ratecoeff.find(coefftype).find('A')
@@ -94,7 +91,7 @@ class ElementaryRxn():
                         b = float(b.text)
                     self.rxnparams.append([A, E, b])
             else:
-                # troefalloffthreebody reaction
+                # Troe falloff threebody reaction
                 if ratecoeff.find('Arrhenius') is None:
                     coefftype = 'modifiedArrhenius'
                 A0 = None
@@ -104,9 +101,9 @@ class ElementaryRxn():
                 Einf = None
                 binf = None
                 for params in ratecoeff.findall(coefftype):
-                    # this indicates that there is a name attribute, implying
-                    # that this is talking about k0 (kinf doesn't get a name for
-                    # some silly reason
+                    # This indicates that there is a name attribute, implying
+                    # we're referring to k0 (kinf doesn't get a name for
+                    # some silly reason)
                     if len(params.attrib) != 0:
                         A0 = params.find('A')
                         E0 = params.find('E')
@@ -150,20 +147,19 @@ class ElementaryRxn():
                 T3 = float(T3.text)
                 alpha = float(alpha.text)
                 self.rxnparams.append([A0, E0, b0, Ainf, Einf, binf, alpha,
-                    T1, T2, T3])
-            # collecting the efficiencies (not applicable for elementary
-            # reactions)
+                                       T1, T2, T3])
+            # Collecting efficiencies (irrelevant for elementary reactions)
             xmleff = ratecoeff.find('efficiencies')
             if xmleff is None:
                 self.efficiencies.append(None)
             else:
                 e = list(map(lambda x: x.split(':'),
-                    xmleff.text.strip().split(' ')))
+                             xmleff.text.strip().split(' ')))
                 ef = []
                 default = float(xmleff.attrib['default'])
-                # this matches the efficiency with the entry in specieslist. if
+                # This matches the efficiency with the entry in specieslist. If
                 # an entry in specieslist exists but is not found in xmleff,
-                # then the default value of xmleff is used
+                # then the default value of xmleff is used.
                 for s in specieslist:
                     found = False
                     for elt in e:
@@ -175,9 +171,8 @@ class ElementaryRxn():
                         ef.append(default)
                 self.efficiencies.append(ef)
 
-        # the transpose here is just to have the stoichiometric coefficients for
-        # each specie lie along a column, with each column being another
-        # reaction
+        # The transpose here ensures the stoichiometric coefficients for
+        # each specie lie along a column; each column is another reaction.
         self.r_stoich = np.array(r_stoich).transpose()
         self.p_stoich = np.array(p_stoich).transpose()
         self.specieslist = specieslist
@@ -384,14 +379,15 @@ class ReversibleRxn(ElementaryRxn):
     def prog_rate(self, x, T):
         '''
         Returns the progress rate for N species going through M
-        reversible, elementary reactions.
+        reversible, elementary reactions. Overwrites the parent method
+        to account for the reversibility.
 
         INPUTS
         ======
         x:       numeric list
                  concentrations of A, B, C
-        T:        numeric type
-                  temperature of reaction
+        T:       numeric type
+                 temperature of reaction
 
         RETURNS
         =======
@@ -429,9 +425,9 @@ class ReversibleRxn(ElementaryRxn):
         return np.sum(omega * self.nuij, axis=1)
 
 class NonelRxn(ElementaryRxn):
-    # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
-    #                                  alpha, T1, T2, T3]
-
+    '''
+    A class that can handle three-body reactions.
+    '''
     def rate_coeff(self, T, parameters):
         # in: self and temperature
         # out: k0, kinf
@@ -442,19 +438,22 @@ class NonelRxn(ElementaryRxn):
         return (k0, kinf)
 
     def tb_rxn_coeff(self, x, T):
-        # in: self and temperature
+        # in: x (species concentrations), temperature
         # out: forward reaction rate coefficient at the given temperature
 
         # Method should be regular ThreeBody or TroeFalloff if the user is instantiating this class; however, it will still return a regular k if the reaction type is elementary.
 
         k_f = []
+
+        # Iterate over each reaction, checking its type as we go
         for rxn_i, value in enumerate(self.type):
             if value == "TroeFalloffThreeBody":
+                # Calculate the two k values
                 k0, kinf = self.rate_coeff(T, self.rxnparams[rxn_i])
                 Pr = []
                 for i, k in enumerate(k0):
-                    M = np.dot(self.efficiencies, x)
-                    Pr.append((k*M[rxn_i])/kinf[i])
+                    M = np.dot(self.efficiencies[rxn_i], x)
+                    Pr.append((k*M)/kinf[i])
 
                 falloffs = self.Troe_falloff(T, Pr, self.rxnparams[rxn_i])
 
@@ -476,6 +475,24 @@ class NonelRxn(ElementaryRxn):
         return k_f
 
     def prog_rate(self, x, T):
+        '''
+        Returns the progress rate for three-body reactions. Overwrites
+        the parent method to calculate [M], the concentration of
+        the mediating third body, for each reaction.
+
+        Can handle a mix of three-body and elementary reactions.
+
+        INPUTS
+        ======
+        x:       numeric list
+                 concentrations of A, B, C
+        T:       numeric type
+                 temperature of reaction
+
+        RETURNS
+        =======
+        omega:   the progress rate for the reaction, numeric
+        '''
         self.M=[]
         for ef_lst in self.efficiencies:
             if ef_lst is None:
@@ -495,11 +512,28 @@ class NonelRxn(ElementaryRxn):
         return omega
 
     def Troe_falloff(self, T, Pr, parameters):
-        # See documentation for equations of the Troe falloff function.
-        # Pr is the non-dimensional reduced pressure, defined in tb_rxn_coeff.
+        '''
+        Computes the Troe falloff function (see documentation for equations).
+        Pr is the non-dimensional reduced pressure, defined in tb_rxn_coeff.
 
-        # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
-        #                                  alpha, T1, T2, T3]
+        INPUTS
+        ======
+        x: numeric list (species concentrations)
+        T: numeric (temperature)
+        Pr: numeric (non-dim reduced pressure, defined in tb_rxn_coeff())
+        parameters: numeric list (reaction parameters)
+
+        RETURNS
+        =======
+        Troe falloff value for the specific Pr and T
+
+        The parameters list is set by the parser inherited from parent class.
+        The order is: [A0, E0, b0, Ainf, Einf, binf, alpha, T1, T2, T3].
+        This provides A, E, and b (the Arrhenius parameters) for calculating
+        first k_0, then for k_inf, followed by the parameters used in the Troe
+        calculations (alpha, T1, T2, and T3).
+        '''
+
         falloff = []
         A = parameters[6]
         T1 = parameters[7]
