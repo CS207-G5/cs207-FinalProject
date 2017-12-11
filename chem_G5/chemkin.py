@@ -501,14 +501,17 @@ class NonelRxn(ElementaryRxn):
         return k_f
 
     def tb_prog_rate(self, x, T):
-        self.M=0
-        for i in range(len(self.specieslist)):
-            if self.efficiencies[i] is None:
-                pass
-            else:
-                self.M+=self.efficiencies[i]*x[i]
-        if self.M==0:
-            self.M=1
+        self.M=[]
+        for ef_lst in self.efficiencies:
+            current=0
+            for i in range(len(self.specieslist)):
+                if ef_lst[i] is None:
+                    pass
+                else:
+                    current+=ef_lst[i]*x[i]
+            if current==0:
+                current=1
+            self.M.append(current)
             
         r=np.array(self.r_stoich)
         kf=self.tb_rxn_coeff(T)
