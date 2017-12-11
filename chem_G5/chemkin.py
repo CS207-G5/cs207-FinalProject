@@ -432,28 +432,6 @@ class NonelRxn(ElementaryRxn):
     # Structure of self.rxnparams is: [A0, E0, b0, Ainf, Einf, binf,
     #                                  alpha, T1, T2, T3]
 
-    # Inherits __init__ from ElementaryRxn
-
-    def nonel_rxn_rate(x):
-        '''
-        Returns the reaction rate, f, for each specie (listed in x)
-        through one or multiple (number of columns in stoich_r)
-        nonelementary reactions.
-
-        f = sum(omega_j*nu_ij) for i species in j reactions.
-
-        INPUTS
-        ======
-        x:        numeric list or array
-                  concentrations of reactants
-
-        RETURNS
-        =======
-        f:        the reaction rate for each specie, numeric
-        '''
-
-        raise NotImplementedError
-
     def rate_coeff(self, T):
         # in: self and temperature
         # out: k0, kinf
@@ -500,7 +478,7 @@ class NonelRxn(ElementaryRxn):
 
         return k_f
 
-    def tb_prog_rate(self, x, T):
+    def prog_rate(self, x, T):
         self.M=[]
         for ef_lst in self.efficiencies:
             if ef_lst is None:
@@ -513,23 +491,12 @@ class NonelRxn(ElementaryRxn):
                     else:
                         current+=ef_lst[i]*x[i]
                 self.M.append(current)
-            
+
         r=np.array(self.r_stoich)
         kf=self.tb_rxn_coeff(T)
         omega=kf*np.product(x**r.T,axis=1)*self.M
         return omega
 
-    def tb_rxn_rate(self, x, T):
-        p_stoich = np.array(self.p_stoich)
-        r_stoich = np.array(self.r_stoich)
-
-        omega = self.tb_prog_rate(x, T)
-
-        if np.shape(p_stoich)[1] == 1: # Handle the one-reaction case
-            return np.sum(omega * (p_stoich - r_stoich))
-        else:
-            return np.sum(omega * (p_stoich - r_stoich), axis=1)
-            
     def Troe_falloff(self, T, Pr):
         # See documentation for equations of the Troe falloff function.
         # Pr is the non-dimensional reduced pressure, defined in tb_rxn_coeff.
