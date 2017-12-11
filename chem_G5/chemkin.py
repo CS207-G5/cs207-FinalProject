@@ -271,6 +271,25 @@ class ElementaryRxn():
             self.p_stoich, self.k))
 
 class ReversibleRxn(ElementaryRxn):
+    '''
+    This class handles the reversible reactions where the reactants produce product, also at the
+    same time, the products react and produce the reactants
+
+    Attributes
+        s:        the list of all species appeared in the reaction
+        r:        numeric list of lists or array
+                  column length must equal length of x
+                  number of columns indicates number of reactions
+                  stoichiometric coefficients of reactants
+        p:        numeric list of lists or array
+                  must be equal in shape to stoich_r
+                  stoichiometric coefficients of products
+        nuij:     the net stoichiometric coefficient of the reaction
+                  nuij = p - r
+        p0:       the default atmospheric pressure          
+        k:        a numeric value (or values, for multiple reactions)
+                  reaction rate coefficient    
+    '''
 
     def __init__(self, filename):
         self.parse(filename)
@@ -283,8 +302,10 @@ class ReversibleRxn(ElementaryRxn):
         self.gamma = np.sum(self.nuij, axis=0)
 
     def read_SQL(self, T):
+        ''' parse the input .xml file into appropriate data structure '''
 
         def choose_t_range(T):
+            ''' decide which NASA coefficient table to read from- low temperature range or high temperature range '''
             t_range=[]
             for species in self.s:
                 v=cursor.execute('''SELECT THIGH
@@ -296,6 +317,7 @@ class ReversibleRxn(ElementaryRxn):
             return t_range
 
         def get_coeffs(species_name, temp_range):
+            ''' read in the NASA coefficients for reactions '''
             if temp_range == 'low':
                 v=cursor.execute('''SELECT COEFF_1,COEFF_2,COEFF_3,COEFF_4,COEFF_5,COEFF_6,COEFF_7
                 from LOW WHERE species_name= ?''',(species_name,)).fetchall()
@@ -318,12 +340,14 @@ class ReversibleRxn(ElementaryRxn):
         self.nasa = np.array(coefs)
 
     def Cp_over_R(self, T):
+        ''' Returns specific heat of each specie given by the NASA polynomials.'''
         a = self.nasa
         Cp_R = (a[:,0] + a[:,1] * T + a[:,2] * T**2.0
                 + a[:,3] * T**3.0 + a[:,4] * T**4.0)
         return Cp_R
 
     def H_over_RT(self, T):
+        ''' Returns the enthalpy of each specie given by the NASA polynomials.'''
         a = self.nasa
         H_RT = (a[:,0] + a[:,1] * T / 2.0 + a[:,2] * T**2.0 / 3.0
                 + a[:,3] * T**3.0 / 4.0 + a[:,4] * T**4.0 / 5.0
@@ -331,6 +355,7 @@ class ReversibleRxn(ElementaryRxn):
         return H_RT
 
     def S_over_R(self, T):
+        ''' Returns the entropy of each specie given by the NASA polynomials. '''
         a = self.nasa
         S_R = (a[:,0] * np.log(T) + a[:,1] * T + a[:,2] * T**2.0 / 2.0
                + a[:,3] * T**3.0 / 3.0 + a[:,4] * T**4.0 / 4.0 + a[:,6])
@@ -426,11 +451,31 @@ class ReversibleRxn(ElementaryRxn):
 
 class NonelRxn(ElementaryRxn):
     '''
-    A class that can handle three-body reactions.
+    A class that can handle three-body reactions in the form of 
+    A + B + M <=> AB + M
+    Where M is an unspecified collision partner that carries away excess energy to stabilize the 
+    AB molecule (forward direction) or supplies energy to break the AB bond (reverse direction).
+
     '''
     def rate_coeff(self, T, parameters):
-        # in: self and temperature
-        # out: k0, kinf
+        '''
+        A falloff reaction is one that has a rate that is first-order in [M] at low pressure, 
+        like a three-body reaction, but becomes zero-order in [M] as [M] increases. Dissociation 
+        / association reactions of polyatomic molecules often exhibit this behavior.In the low-pressure 
+        limit, this approaches k0, and in the high-pressure limit it approaches k∞
+
+        INPUTS
+        ======
+        T:        numeric type
+                  temperature of reaction
+        parameters: the parameters come with the reaction
+
+        RETURNS
+        =======
+        k0:       the k for low-pressure limit
+        kinf:     the k for high-pressure limit
+        '''
+
         k0 = []
         kinf = []
         k0.append(reaction_coeffs.arrh(parameters[0], parameters[1], T))
@@ -438,10 +483,24 @@ class NonelRxn(ElementaryRxn):
         return (k0, kinf)
 
     def tb_rxn_coeff(self, x, T):
-        # in: x (species concentrations), temperature
-        # out: forward reaction rate coefficient at the given temperature
+        '''
+        Returns the forward reaction rate coefficient at the given temperature
+        for three-body reactions. Method should be regular ThreeBody or TroeFalloff 
+        if the user is instantiating this class; however, it will still return a 
+        regular k if the reaction type is elementary.
 
-        # Method should be regular ThreeBody or TroeFalloff if the user is instantiating this class; however, it will still return a regular k if the reaction type is elementary.
+        INPUTS
+        ======
+        x:       numeric list
+                 concentrations of A, B, C
+        T:       numeric type
+                 temperature of reaction
+
+        RETURNS
+        =======
+        k_f:   the forward reaction rate coefficient
+
+        '''
 
         k_f = []
 
