@@ -453,8 +453,8 @@ class NonelRxn(ElementaryRxn):
                 k0, kinf = self.rate_coeff(T, self.rxnparams[rxn_i])
                 Pr = []
                 for i, k in enumerate(k0):
-                    M = np.dot(self.efficiencies, x)
-                    Pr.append((k*M[rxn_i])/kinf[i])
+                    M = np.dot(self.efficiencies[rxn_i], x)
+                    Pr.append((k*M)/kinf[i])
 
                 falloffs = self.Troe_falloff(T, Pr, self.rxnparams[rxn_i])
 
