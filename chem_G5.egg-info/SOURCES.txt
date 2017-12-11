@@ -1,4 +1,5 @@
 README.md
+setup.cfg
 setup.py
 chem_G5/__init__.py
 chem_G5/chemkin.py

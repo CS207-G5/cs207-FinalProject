@@ -3,7 +3,7 @@ def readme():
     with open('README.md') as f:
         return f.read()
 setup(name='chem_G5',
-      version='1.0',
+      version='2.0',
       description='Elementray reaction and reversible reaction',
       long_description=readme(),
       classifiers=[
