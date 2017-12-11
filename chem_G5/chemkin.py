@@ -265,10 +265,8 @@ class ElementaryRxn():
             return np.sum(omega * (p_stoich - r_stoich), axis=1)
 
     def __str__(self):
-        return("Stoichiometric coefficients of reactants: {}\n\
-            Stoichiometric coefficients of reactants: {}\n\
-            Reaction rate coefficient: {}".format(self.r_stoich,\
-            self.p_stoich, self.k))
+        return("Stoichiometric coefficients of reactants:\n{}\nStoichiometric coefficients of reactants:\n{}".format(self.r_stoich,\
+            self.p_stoich))
 
 class ReversibleRxn(ElementaryRxn):
 
